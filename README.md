@@ -22,14 +22,14 @@ CrunchyList isn't on the Chrome Web Store yet. Install it manually in developer 
 3. **Enable Developer Mode** — Toggle the switch in the top right
 4. **Load the extension** — Click "Load unpacked" and select the `extension/` folder (not the repo root)
 5. **Log into Crunchyroll** — Make sure the Chrome profile is logged into a Crunchyroll account
-6. **Set your PIN** — Right-click the CrunchyList icon > Options, then create a 4-digit PIN
+6. **Set your PIN** — Open the options page (right-click the CrunchyList icon > **Options**, or go to `chrome://extensions`, click the three-dot menu on CrunchyList, and select **Options**). Create a 4-digit PIN
 7. **You're ready** — Open a new tab to see the landing page. SPY x FAMILY is included as a starter show. Add more from the options page.
 
 ## Setup
 
 ### Adding Shows
 
-1. Right-click the CrunchyList extension icon and select **Options**
+1. Open the CrunchyList options page — either right-click the extension icon and select **Options**, or go to `chrome://extensions`, click the three-dot menu (⋮) on CrunchyList, and select **Options**
 2. Enter your 4-digit PIN
 3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family`)
 4. The title and poster image are fetched automatically
@@ -99,7 +99,7 @@ CrunchyList/
     ├── content.js          # DOM cleanup + watch page validation
     ├── landing.html/js/css # Kid-facing tile grid
     ├── options.html/js     # PIN-protected parent settings
-    ├── whitelist.json      # Default whitelist (empty)
+    ├── whitelist.json      # Default whitelist (SPY x FAMILY)
     └── icons/
 ```
 
