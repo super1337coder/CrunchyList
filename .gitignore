@@ -1,0 +1,19 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Node (shouldn't be needed, but just in case)
+node_modules/
+
+# Chrome extension packaging
+*.zip
+*.crx
+*.pem

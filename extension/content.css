@@ -1,0 +1,62 @@
+/*
+ * CrunchyList — Content CSS
+ * Injected at document_start on crunchyroll.com to hide UI elements immediately.
+ *
+ * STRATEGY: Only hide specific, safe-to-hide elements. Avoid broad wildcards
+ * like [class*="hero"] that can accidentally catch player layout containers.
+ * When in doubt, leave it visible — content.js will clean up anything we miss.
+ *
+ * IMPORTANT: Do NOT hide the video player, Chromecast button, episode list,
+ * season selector, or progress indicators.
+ */
+
+/* === NAVIGATION & HEADER === */
+header,
+[data-t="header"],
+[class*="erc-header"],
+.erc-header {
+  display: none !important;
+}
+
+/* === SEARCH === */
+input[type="search"],
+[data-t="search-input"],
+[aria-label="Search"] {
+  display: none !important;
+}
+
+/* === FOOTER === */
+footer,
+[data-t="footer"] {
+  display: none !important;
+}
+
+/* === SIDEBAR === */
+aside {
+  display: none !important;
+}
+
+/* === RECOMMENDATIONS / "MORE LIKE THIS" === */
+[data-t="recommendations"],
+[data-t="more-like-this"],
+[class*="up-next-section"],
+[class*="UpNextSection"] {
+  display: none !important;
+}
+
+/* === COMMENTS === */
+[data-t="comments"] {
+  display: none !important;
+}
+
+/* === SPECIFIC NAV LINKS (hide by href, not by class wildcard) === */
+a[href*="/browse"],
+a[href*="/search"],
+a[href*="/history"],
+a[href*="/watchlist"],
+a[href*="/account"],
+a[href*="/settings"],
+a[href*="/news"],
+a[href*="/games"] {
+  display: none !important;
+}

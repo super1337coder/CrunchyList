@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrunchyList Settings</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    h1 {
+      color: #f47521;
+      margin-bottom: 8px;
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      color: #8888aa;
+      margin-bottom: 32px;
+      font-size: 0.9rem;
+    }
+
+    /* === PIN Gate === */
+    #pin-gate {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    #pin-gate h2 {
+      color: #f47521;
+      margin-bottom: 16px;
+    }
+
+    #pin-gate p {
+      color: #8888aa;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .pin-inputs {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .pin-digit {
+      width: 56px;
+      height: 64px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: #16213e;
+      border: 2px solid #2a2a4a;
+      border-radius: 8px;
+      color: #fff;
+      outline: none;
+    }
+
+    .pin-digit:focus {
+      border-color: #f47521;
+    }
+
+    .pin-error {
+      color: #ff4444;
+      font-size: 0.85rem;
+      min-height: 20px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary {
+      background: #f47521;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #e0651a;
+    }
+
+    .btn-danger {
+      background: #ff4444;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #cc3333;
+    }
+
+    .btn-secondary {
+      background: #2a2a4a;
+      color: #ccc;
+    }
+
+    .btn-secondary:hover {
+      background: #3a3a5a;
+    }
+
+    /* === Main Settings (hidden until PIN verified) === */
+    #settings {
+      display: none;
+    }
+
+    /* === Add Show Form === */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      padding: 10px 14px;
+      background: #16213e;
+      border: 2px solid #2a2a4a;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus {
+      border-color: #f47521;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-row .btn {
+      margin-bottom: 20px;
+      white-space: nowrap;
+    }
+
+    .help-text {
+      font-size: 0.8rem;
+      color: #666688;
+      margin-top: 4px;
+    }
+
+    .status-message {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .status-success {
+      background: #1a3a1a;
+      color: #4caf50;
+      border: 1px solid #2a5a2a;
+    }
+
+    .status-error {
+      background: #3a1a1a;
+      color: #ff4444;
+      border: 1px solid #5a2a2a;
+    }
+
+    /* === Whitelist Table === */
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+      color: #ddd;
+    }
+
+    .show-list {
+      margin-top: 32px;
+    }
+
+    .show-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      background: #16213e;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .show-item-image {
+      width: 48px;
+      height: 72px;
+      border-radius: 4px;
+      object-fit: cover;
+      background: #0f3460;
+      flex-shrink: 0;
+    }
+
+    .show-item-placeholder {
+      width: 48px;
+      height: 72px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #0f3460, #1a1a2e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #f47521;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .show-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .show-item-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .show-item-id {
+      font-size: 0.75rem;
+      color: #6688aa;
+      font-family: monospace;
+    }
+
+    .show-item .btn-danger {
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      flex-shrink: 0;
+    }
+
+    .empty-list {
+      text-align: center;
+      color: #666688;
+      padding: 32px;
+      font-size: 0.95rem;
+    }
+
+    /* === PIN management section === */
+    .pin-section {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 1px solid #2a2a4a;
+    }
+
+    .pin-section h2 {
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- PIN Gate -->
+    <div id="pin-gate">
+      <h2 id="pin-title">Enter PIN</h2>
+      <p id="pin-description">Enter your 4-digit PIN to access settings.</p>
+      <div class="pin-inputs">
+        <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="0" autofocus>
+        <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="1">
+        <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="2">
+        <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="3">
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+      <button class="btn btn-primary" id="pin-submit">Continue</button>
+    </div>
+
+    <!-- Settings (hidden until PIN) -->
+    <div id="settings">
+      <h1>CrunchyList Settings</h1>
+      <p class="subtitle">Manage your kids' approved show list.</p>
+
+      <div id="status" class="status-message"></div>
+
+      <!-- Add Show Form -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="show-url">Crunchyroll Series URL</label>
+          <input type="url" id="show-url" placeholder="https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family">
+          <div class="help-text">Paste the full URL of a Crunchyroll series page.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="show-title">Display Name</label>
+          <input type="text" id="show-title" placeholder="SPY x FAMILY">
+          <div class="help-text">Name shown on the tile. Auto-filled from URL slug if left blank.</div>
+        </div>
+        <div class="form-group">
+          <label for="show-image">Image URL (optional)</label>
+          <input type="url" id="show-image" placeholder="https://...">
+          <div class="help-text">Auto-fetched from Crunchyroll. Override by pasting a URL.</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <button class="btn btn-primary" id="add-show">Add Show</button>
+      </div>
+
+      <!-- Current Whitelist -->
+      <div class="show-list">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="margin-bottom: 0;">Approved Shows</h2>
+          <button class="btn btn-secondary" id="fetch-all-images">Fetch All Images</button>
+        </div>
+        <div id="show-list-container"></div>
+      </div>
+
+      <!-- PIN Management -->
+      <div class="pin-section">
+        <h2>Change PIN</h2>
+        <div style="display: flex; gap: 12px; align-items: flex-end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="new-pin">New 4-Digit PIN</label>
+            <input type="password" id="new-pin" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" placeholder="****" style="width: 120px; padding: 10px 14px; background: #16213e; border: 2px solid #2a2a4a; border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none; text-align: center; letter-spacing: 8px;">
+          </div>
+          <button class="btn btn-secondary" id="change-pin" style="margin-bottom: 0;">Update PIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
