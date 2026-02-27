@@ -2,6 +2,8 @@
 
 A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch — everything else is hidden.
 
+![CrunchyList landing page](screenshots/MainMenu.png)
+
 ## The Problem
 
 Crunchyroll's built-in parental controls are too blunt. Either too much fan service gets through, or the filters are so tight that age-appropriate shows get blocked. CrunchyList solves this by letting a parent hand-pick exactly which series are allowed.
