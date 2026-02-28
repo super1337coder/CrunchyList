@@ -280,12 +280,36 @@
    */
   async function attemptCast() {
     try {
-      const video = document.querySelector('video');
+      // CR loads the video player asynchronously — wait up to 5 seconds for it.
+      // Also check iframes since CR may embed the player in one.
+      function findVideo() {
+        let v = document.querySelector('video');
+        if (v) return v;
+        // Check iframes (same-origin only)
+        const iframes = document.querySelectorAll('iframe');
+        for (const iframe of iframes) {
+          try {
+            v = iframe.contentDocument?.querySelector('video');
+            if (v) return v;
+          } catch { /* cross-origin — skip */ }
+        }
+        return null;
+      }
+
+      let video = findVideo();
       if (!video) {
-        console.log('[CrunchyList] No video element found — showing manual instructions');
+        for (let i = 0; i < 10; i++) {
+          await new Promise(r => setTimeout(r, 500));
+          video = findVideo();
+          if (video) break;
+        }
+      }
+      if (!video) {
+        console.log('[CrunchyList] No video element found after waiting — showing manual instructions');
         showCastOverlay();
         return;
       }
+      console.log('[CrunchyList] Found video element:', video.src || '(no src, likely MSE)');
       // Remove disableRemotePlayback if CR set it
       video.disableRemotePlayback = false;
       if (!video.remote) {
