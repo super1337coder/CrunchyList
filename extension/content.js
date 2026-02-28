@@ -265,81 +265,18 @@
       </svg>
       Cast to TV
     `;
-    btn.addEventListener('click', attemptCast);
+    btn.addEventListener('click', showCastOverlay);
     document.body.appendChild(btn);
   }
 
   // Run on initial load
   manageCastButton();
 
-  /**
-   * Try to cast using the Remote Playback API (video.remote.prompt()).
-   * This opens Chrome's native cast device picker and can stream the actual
-   * video at full quality. If it fails (DRM, no video, not supported, etc.),
-   * fall back to showing manual instructions.
-   */
-  async function attemptCast() {
-    try {
-      // CR loads the video player asynchronously — wait up to 5 seconds for it.
-      // Check main DOM, shadow DOMs, and iframes since CR may embed the player.
-      function findVideo() {
-        // 1. Direct query
-        let v = document.querySelector('video');
-        if (v) return v;
-        // 2. Check shadow roots (CR's Vilos player may use shadow DOM)
-        const allEls = document.querySelectorAll('*');
-        for (const el of allEls) {
-          if (el.shadowRoot) {
-            v = el.shadowRoot.querySelector('video');
-            if (v) return v;
-          }
-        }
-        // 3. Check iframes (same-origin only)
-        const iframes = document.querySelectorAll('iframe');
-        for (const iframe of iframes) {
-          try {
-            v = iframe.contentDocument?.querySelector('video');
-            if (v) return v;
-          } catch { /* cross-origin — skip */ }
-        }
-        return null;
-      }
-
-      let video = findVideo();
-      if (!video) {
-        for (let i = 0; i < 10; i++) {
-          await new Promise(r => setTimeout(r, 500));
-          video = findVideo();
-          if (video) break;
-        }
-      }
-      if (!video) {
-        // Diagnostic: log what player elements exist
-        const playerEls = document.querySelectorAll('[class*="vilos"], [class*="player"], [class*="Player"], [id*="player"], [id*="vilos"], #player0');
-        console.log('[CrunchyList] No video element found. Player-related elements:', playerEls.length);
-        playerEls.forEach(el => console.log('[CrunchyList]  -', el.tagName, el.id || '', el.className?.substring?.(0, 80) || ''));
-        // Check for any iframes
-        const iframes = document.querySelectorAll('iframe');
-        console.log('[CrunchyList] Iframes on page:', iframes.length);
-        iframes.forEach(f => console.log('[CrunchyList]  - iframe src:', f.src?.substring(0, 120) || '(no src)'));
-        showCastOverlay();
-        return;
-      }
-      console.log('[CrunchyList] Found video element:', video.src || '(no src, likely MSE)');
-      // Remove disableRemotePlayback if CR set it
-      video.disableRemotePlayback = false;
-      if (!video.remote) {
-        console.log('[CrunchyList] Remote Playback API not available — showing manual instructions');
-        showCastOverlay();
-        return;
-      }
-      await video.remote.prompt();
-      console.log('[CrunchyList] Remote Playback prompt opened successfully');
-    } catch (err) {
-      console.log('[CrunchyList] Remote Playback failed:', err.message, '— showing manual instructions');
-      showCastOverlay();
-    }
-  }
+  // NOTE: We investigated using the Remote Playback API (video.remote.prompt())
+  // to open Chrome's native cast picker directly. However, CR's video player
+  // lives in a cross-origin iframe (static.crunchyroll.com/vilos-v2/...),
+  // so the content script cannot access the <video> element. The manual
+  // instructions overlay is the best we can do from an extension.
 
   function showCastOverlay() {
     // Don't double-show
