@@ -176,6 +176,8 @@
   ];
 
   function shouldPreserve(el) {
+    // Never hide our own injected elements
+    if (el.id && el.id.startsWith('crunchylist-')) return true;
     for (const sel of PRESERVE_SELECTORS) {
       if (el.matches(sel) || el.querySelector(sel)) {
         return true;
@@ -230,8 +232,24 @@
   }
 
   // --- Cast button for watch pages ---
-  if (WATCH_URL_RE.test(window.location.pathname)) {
-    injectCastButton();
+  // CR uses SPA navigation (React/Next.js), so we need to check the URL
+  // both on initial load and whenever the DOM changes (URL may have changed).
+  let lastCastCheckUrl = '';
+
+  function manageCastButton() {
+    const isWatchPage = WATCH_URL_RE.test(window.location.pathname);
+    const currentUrl = window.location.pathname;
+    const btn = document.getElementById('crunchylist-cast-btn');
+
+    if (isWatchPage && !btn) {
+      injectCastButton();
+    } else if (!isWatchPage && btn) {
+      btn.remove();
+      // Also remove overlay if open
+      const overlay = document.getElementById('crunchylist-cast-overlay');
+      if (overlay) overlay.remove();
+    }
+    lastCastCheckUrl = currentUrl;
   }
 
   function injectCastButton() {
@@ -250,6 +268,9 @@
     btn.addEventListener('click', showCastOverlay);
     document.body.appendChild(btn);
   }
+
+  // Run on initial load
+  manageCastButton();
 
   function showCastOverlay() {
     // Don't double-show
@@ -287,7 +308,7 @@
   // Initial cleanup
   hideElements();
 
-  // MutationObserver to catch dynamically loaded content
+  // MutationObserver to catch dynamically loaded content + SPA navigation
   const observer = new MutationObserver((mutations) => {
     let needsCleanup = false;
     for (const mutation of mutations) {
@@ -298,6 +319,10 @@
     }
     if (needsCleanup) {
       hideElements();
+      // Check if URL changed (SPA navigation) and manage cast button
+      if (window.location.pathname !== lastCastCheckUrl) {
+        manageCastButton();
+      }
     }
   });
 
