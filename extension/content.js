@@ -265,18 +265,54 @@
       </svg>
       Cast to TV
     `;
-    btn.addEventListener('click', showCastOverlay);
+    btn.addEventListener('click', attemptCast);
     document.body.appendChild(btn);
   }
 
   // Run on initial load
   manageCastButton();
 
-  // NOTE: We investigated using the Remote Playback API (video.remote.prompt())
-  // to open Chrome's native cast picker directly. However, CR's video player
-  // lives in a cross-origin iframe (static.crunchyroll.com/vilos-v2/...),
-  // so the content script cannot access the <video> element. The manual
-  // instructions overlay is the best we can do from an extension.
+  /**
+   * Try to cast via the Remote Playback API by messaging our cast-player.js
+   * script running inside CR's Vilos player iframe. If it succeeds, Chrome's
+   * native cast picker opens. If it fails, fall back to manual instructions.
+   */
+  function attemptCast() {
+    // Find the Vilos player iframe
+    const playerIframe = document.querySelector('iframe#player0, iframe[src*="vilos"], iframe[src*="static.crunchyroll.com"]');
+    if (!playerIframe) {
+      console.log('[CrunchyList] No player iframe found — showing manual instructions');
+      showCastOverlay();
+      return;
+    }
+
+    // Set up a one-shot listener for the response
+    let responded = false;
+    const timeout = setTimeout(() => {
+      if (!responded) {
+        responded = true;
+        console.log('[CrunchyList] Cast request timed out — showing manual instructions');
+        showCastOverlay();
+      }
+    }, 3000);
+
+    function onMessage(e) {
+      if (e.data?.type !== 'CRUNCHYLIST_CAST_RESULT') return;
+      responded = true;
+      clearTimeout(timeout);
+      window.removeEventListener('message', onMessage);
+      if (e.data.success) {
+        console.log('[CrunchyList] Remote Playback prompt opened successfully');
+      } else {
+        console.log('[CrunchyList] Remote Playback failed:', e.data.reason, '— showing manual instructions');
+        showCastOverlay();
+      }
+    }
+    window.addEventListener('message', onMessage);
+
+    // Send cast request to the player iframe
+    playerIframe.contentWindow.postMessage({ type: 'CRUNCHYLIST_CAST' }, '*');
+  }
 
   function showCastOverlay() {
     // Don't double-show
