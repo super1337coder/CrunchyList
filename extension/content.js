@@ -6,7 +6,6 @@
 (async function () {
   'use strict';
 
-  const SERIES_URL_RE = /\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?series\/([A-Z0-9]+)/i;
   const WATCH_URL_RE = /\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?watch\//i;
 
   // Get the landing page URL from the background script
@@ -165,8 +164,6 @@
     '[class*="vilos"]',
     '[class*="player"]',
     '[class*="Player"]',
-    '[class*="cast"]',
-    '[class*="chromecast"]',
     '[class*="episode"]',
     '[class*="Episode"]',
     '[class*="season"]',
@@ -230,11 +227,6 @@
       }
     }
   }
-
-  // --- Cast button ---
-  // The cast button lives inside the Vilos player iframe (cast-player.js).
-  // It must be clicked directly inside the iframe to preserve the user gesture
-  // chain required by RemotePlayback.prompt().
 
   // Initial cleanup
   hideElements();

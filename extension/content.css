@@ -6,8 +6,8 @@
  * like [class*="hero"] that can accidentally catch player layout containers.
  * When in doubt, leave it visible — content.js will clean up anything we miss.
  *
- * IMPORTANT: Do NOT hide the video player, Chromecast button, episode list,
- * season selector, or progress indicators.
+ * IMPORTANT: Do NOT hide the video player, episode list, season selector,
+ * or progress indicators.
  */
 
 /* === NAVIGATION & HEADER === */
@@ -61,7 +61,3 @@ a[href*="/games"] {
   display: none !important;
 }
 
-/* === CAST BUTTON ===
- * The cast button is now injected inside the Vilos player iframe by
- * cast-player.js (styles are inline since CSS can't cross iframe boundaries).
- */

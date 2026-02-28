@@ -8,8 +8,7 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "*://*.crunchyroll.com/*",
-    "*://static.crunchyroll.com/*"
+    "*://*.crunchyroll.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -24,12 +23,6 @@
       "matches": ["*://*.crunchyroll.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
-    },
-    {
-      "matches": ["*://static.crunchyroll.com/vilos-v2/*"],
-      "js": ["cast-player.js"],
-      "run_at": "document_idle",
-      "all_frames": true
     }
   ],
   "chrome_url_overrides": {
