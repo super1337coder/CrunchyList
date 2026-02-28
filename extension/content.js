@@ -231,121 +231,10 @@
     }
   }
 
-  // --- Cast button for watch pages ---
-  // CR uses SPA navigation (React/Next.js), so we need to check the URL
-  // both on initial load and whenever the DOM changes (URL may have changed).
-  let lastCastCheckUrl = '';
-
-  function manageCastButton() {
-    const isWatchPage = WATCH_URL_RE.test(window.location.pathname);
-    const currentUrl = window.location.pathname;
-    const btn = document.getElementById('crunchylist-cast-btn');
-
-    if (isWatchPage && !btn) {
-      injectCastButton();
-    } else if (!isWatchPage && btn) {
-      btn.remove();
-      // Also remove overlay if open
-      const overlay = document.getElementById('crunchylist-cast-overlay');
-      if (overlay) overlay.remove();
-    }
-    lastCastCheckUrl = currentUrl;
-  }
-
-  function injectCastButton() {
-    // Don't double-inject
-    if (document.getElementById('crunchylist-cast-btn')) return;
-
-    // Floating cast button
-    const btn = document.createElement('button');
-    btn.id = 'crunchylist-cast-btn';
-    btn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="vertical-align: middle; margin-right: 6px;">
-        <path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
-      </svg>
-      Cast to TV
-    `;
-    btn.addEventListener('click', attemptCast);
-    document.body.appendChild(btn);
-  }
-
-  // Run on initial load
-  manageCastButton();
-
-  /**
-   * Try to cast via the Remote Playback API by messaging our cast-player.js
-   * script running inside CR's Vilos player iframe. If it succeeds, Chrome's
-   * native cast picker opens. If it fails, fall back to manual instructions.
-   */
-  function attemptCast() {
-    // Find the Vilos player iframe
-    const playerIframe = document.querySelector('iframe#player0, iframe[src*="vilos"], iframe[src*="static.crunchyroll.com"]');
-    if (!playerIframe) {
-      console.log('[CrunchyList] No player iframe found — showing manual instructions');
-      showCastOverlay();
-      return;
-    }
-
-    // Set up a one-shot listener for the response
-    let responded = false;
-    const timeout = setTimeout(() => {
-      if (!responded) {
-        responded = true;
-        console.log('[CrunchyList] Cast request timed out — showing manual instructions');
-        showCastOverlay();
-      }
-    }, 3000);
-
-    function onMessage(e) {
-      if (e.data?.type !== 'CRUNCHYLIST_CAST_RESULT') return;
-      responded = true;
-      clearTimeout(timeout);
-      window.removeEventListener('message', onMessage);
-      if (e.data.success) {
-        console.log('[CrunchyList] Remote Playback prompt opened successfully');
-      } else {
-        console.log('[CrunchyList] Remote Playback failed:', e.data.reason, '— showing manual instructions');
-        showCastOverlay();
-      }
-    }
-    window.addEventListener('message', onMessage);
-
-    // Send cast request to the player iframe
-    playerIframe.contentWindow.postMessage({ type: 'CRUNCHYLIST_CAST' }, '*');
-  }
-
-  function showCastOverlay() {
-    // Don't double-show
-    if (document.getElementById('crunchylist-cast-overlay')) return;
-
-    const overlay = document.createElement('div');
-    overlay.id = 'crunchylist-cast-overlay';
-    overlay.innerHTML = `
-      <div id="crunchylist-cast-modal">
-        <h3 style="margin: 0 0 12px; font-size: 16px; color: #fff;">Cast to your TV</h3>
-        <ol style="margin: 0 0 16px; padding-left: 20px; font-size: 14px; color: #ccc; line-height: 1.8;">
-          <li>Click the <strong style="color:#fff;">⋮ menu</strong> (three dots, top-right of Chrome)</li>
-          <li>Select <strong style="color:#fff;">Cast, Save, and Share</strong></li>
-          <li>Click <strong style="color:#fff;">Cast</strong></li>
-          <li>Pick your TV from the list</li>
-        </ol>
-        <p style="margin: 0 0 16px; font-size: 13px; color: #888;">
-          Tip: Start casting first, then press <strong style="color:#aaa;">F</strong> to go fullscreen for the best picture.
-        </p>
-        <button id="crunchylist-cast-dismiss" style="
-          background: #f47521; color: #fff; border: none; border-radius: 8px;
-          padding: 8px 24px; font-size: 14px; font-weight: 600; cursor: pointer;
-        ">Got it</button>
-      </div>
-    `;
-    overlay.addEventListener('click', (e) => {
-      // Close on clicking backdrop or dismiss button
-      if (e.target === overlay || e.target.id === 'crunchylist-cast-dismiss') {
-        overlay.remove();
-      }
-    });
-    document.body.appendChild(overlay);
-  }
+  // --- Cast button ---
+  // The cast button lives inside the Vilos player iframe (cast-player.js).
+  // It must be clicked directly inside the iframe to preserve the user gesture
+  // chain required by RemotePlayback.prompt().
 
   // Initial cleanup
   hideElements();
@@ -361,10 +250,6 @@
     }
     if (needsCleanup) {
       hideElements();
-      // Check if URL changed (SPA navigation) and manage cast button
-      if (window.location.pathname !== lastCastCheckUrl) {
-        manageCastButton();
-      }
     }
   });
 
