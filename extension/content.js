@@ -278,44 +278,27 @@
    * video at full quality. If it fails (DRM, no video, not supported, etc.),
    * fall back to showing manual instructions.
    */
-  function attemptCast() {
-    // Inject into page context since content scripts can't access video.remote
-    // (it's a page-world object). We listen for the result via a custom event.
-    const script = document.createElement('script');
-    script.textContent = `
-      (async function() {
-        try {
-          const video = document.querySelector('video');
-          if (!video) {
-            document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: 'no-video' } }));
-            return;
-          }
-          // Remove disableRemotePlayback if CR set it
-          video.disableRemotePlayback = false;
-          if (!video.remote) {
-            document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: 'no-remote-api' } }));
-            return;
-          }
-          await video.remote.prompt();
-          document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: true } }));
-        } catch (err) {
-          document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: err.message || 'unknown' } }));
-        }
-      })();
-    `;
-
-    // Listen for the result (one-shot)
-    document.addEventListener('crunchylist-cast-result', function onResult(e) {
-      document.removeEventListener('crunchylist-cast-result', onResult);
-      if (!e.detail.success) {
-        console.log('[CrunchyList] Remote Playback failed:', e.detail.reason, '— showing manual instructions');
+  async function attemptCast() {
+    try {
+      const video = document.querySelector('video');
+      if (!video) {
+        console.log('[CrunchyList] No video element found — showing manual instructions');
         showCastOverlay();
+        return;
       }
-      // If successful, Chrome's native cast picker is already open — nothing else to do
-    }, { once: true });
-
-    document.head.appendChild(script);
-    script.remove(); // Clean up the injected script tag
+      // Remove disableRemotePlayback if CR set it
+      video.disableRemotePlayback = false;
+      if (!video.remote) {
+        console.log('[CrunchyList] Remote Playback API not available — showing manual instructions');
+        showCastOverlay();
+        return;
+      }
+      await video.remote.prompt();
+      console.log('[CrunchyList] Remote Playback prompt opened successfully');
+    } catch (err) {
+      console.log('[CrunchyList] Remote Playback failed:', err.message, '— showing manual instructions');
+      showCastOverlay();
+    }
   }
 
   function showCastOverlay() {
