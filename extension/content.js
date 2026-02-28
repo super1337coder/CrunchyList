@@ -265,12 +265,58 @@
       </svg>
       Cast to TV
     `;
-    btn.addEventListener('click', showCastOverlay);
+    btn.addEventListener('click', attemptCast);
     document.body.appendChild(btn);
   }
 
   // Run on initial load
   manageCastButton();
+
+  /**
+   * Try to cast using the Remote Playback API (video.remote.prompt()).
+   * This opens Chrome's native cast device picker and can stream the actual
+   * video at full quality. If it fails (DRM, no video, not supported, etc.),
+   * fall back to showing manual instructions.
+   */
+  function attemptCast() {
+    // Inject into page context since content scripts can't access video.remote
+    // (it's a page-world object). We listen for the result via a custom event.
+    const script = document.createElement('script');
+    script.textContent = `
+      (async function() {
+        try {
+          const video = document.querySelector('video');
+          if (!video) {
+            document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: 'no-video' } }));
+            return;
+          }
+          // Remove disableRemotePlayback if CR set it
+          video.disableRemotePlayback = false;
+          if (!video.remote) {
+            document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: 'no-remote-api' } }));
+            return;
+          }
+          await video.remote.prompt();
+          document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: true } }));
+        } catch (err) {
+          document.dispatchEvent(new CustomEvent('crunchylist-cast-result', { detail: { success: false, reason: err.message || 'unknown' } }));
+        }
+      })();
+    `;
+
+    // Listen for the result (one-shot)
+    document.addEventListener('crunchylist-cast-result', function onResult(e) {
+      document.removeEventListener('crunchylist-cast-result', onResult);
+      if (!e.detail.success) {
+        console.log('[CrunchyList] Remote Playback failed:', e.detail.reason, '— showing manual instructions');
+        showCastOverlay();
+      }
+      // If successful, Chrome's native cast picker is already open — nothing else to do
+    }, { once: true });
+
+    document.head.appendChild(script);
+    script.remove(); // Clean up the injected script tag
+  }
 
   function showCastOverlay() {
     // Don't double-show
