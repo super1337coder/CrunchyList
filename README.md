@@ -13,7 +13,7 @@ Crunchyroll's built-in parental controls are too blunt. Either too much fan serv
 - **Kids** open Chrome and see a tile grid of parent-approved shows. Clicking a tile goes to that show's Crunchyroll page, stripped down to just the video player and episode list. Everything else (browse, search, recommendations, etc.) is hidden.
 - **Parents** manage the approved show list through a PIN-protected settings page. Just paste a Crunchyroll series URL and the extension pulls in the title and poster art automatically.
 - **Navigation is locked down** — any attempt to browse to a non-approved show on Crunchyroll redirects back to the CrunchyList landing page.
-- **Chromecast works natively** — the CR video player's cast button is preserved, so kids can cast to a TV at full streaming quality.
+- **TV casting** — Crunchyroll removed Chromecast from their web player, so use Chrome's built-in tab casting (three-dot menu → Cast) to send to a TV, or use the Crunchyroll mobile app for native cast quality.
 
 ## Install
 
