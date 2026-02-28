@@ -281,11 +281,20 @@
   async function attemptCast() {
     try {
       // CR loads the video player asynchronously — wait up to 5 seconds for it.
-      // Also check iframes since CR may embed the player in one.
+      // Check main DOM, shadow DOMs, and iframes since CR may embed the player.
       function findVideo() {
+        // 1. Direct query
         let v = document.querySelector('video');
         if (v) return v;
-        // Check iframes (same-origin only)
+        // 2. Check shadow roots (CR's Vilos player may use shadow DOM)
+        const allEls = document.querySelectorAll('*');
+        for (const el of allEls) {
+          if (el.shadowRoot) {
+            v = el.shadowRoot.querySelector('video');
+            if (v) return v;
+          }
+        }
+        // 3. Check iframes (same-origin only)
         const iframes = document.querySelectorAll('iframe');
         for (const iframe of iframes) {
           try {
@@ -305,7 +314,14 @@
         }
       }
       if (!video) {
-        console.log('[CrunchyList] No video element found after waiting — showing manual instructions');
+        // Diagnostic: log what player elements exist
+        const playerEls = document.querySelectorAll('[class*="vilos"], [class*="player"], [class*="Player"], [id*="player"], [id*="vilos"], #player0');
+        console.log('[CrunchyList] No video element found. Player-related elements:', playerEls.length);
+        playerEls.forEach(el => console.log('[CrunchyList]  -', el.tagName, el.id || '', el.className?.substring?.(0, 80) || ''));
+        // Check for any iframes
+        const iframes = document.querySelectorAll('iframe');
+        console.log('[CrunchyList] Iframes on page:', iframes.length);
+        iframes.forEach(f => console.log('[CrunchyList]  - iframe src:', f.src?.substring(0, 120) || '(no src)'));
         showCastOverlay();
         return;
       }
