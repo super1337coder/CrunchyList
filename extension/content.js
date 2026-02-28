@@ -288,7 +288,7 @@
           <li>Pick your TV from the list</li>
         </ol>
         <p style="margin: 0 0 16px; font-size: 13px; color: #888;">
-          Tip: Go fullscreen <strong style="color:#aaa;">(F)</strong> on the video before casting for the best picture.
+          Tip: Start casting first, then press <strong style="color:#aaa;">F</strong> to go fullscreen for the best picture.
         </p>
         <button id="crunchylist-cast-dismiss" style="
           background: #f47521; color: #fff; border: none; border-radius: 8px;
