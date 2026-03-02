@@ -2,6 +2,8 @@
 
 A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch — everything else is hidden.
 
+A [Last Gen Labs](https://lastgenlabs.com) project.
+
 ![CrunchyList landing page](screenshots/MainMenu.png)
 
 ## The Problem
