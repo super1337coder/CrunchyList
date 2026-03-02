@@ -1,6 +1,6 @@
 # CrunchyList
 
-A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch — everything else is hidden.
+A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch. Everything else is hidden.
 
 A [Last Gen Labs](https://lastgenlabs.com) project.
 
@@ -14,25 +14,25 @@ Crunchyroll's built-in parental controls are too blunt. Either too much fan serv
 
 - **Kids** open Chrome and see a tile grid of parent-approved shows. Clicking a tile goes to that show's Crunchyroll page, stripped down to just the video player and episode list. Everything else (browse, search, recommendations, etc.) is hidden.
 - **Parents** manage the approved show list through a PIN-protected settings page. Just paste a Crunchyroll series URL and the extension pulls in the title and poster art automatically.
-- **Navigation is locked down** — any attempt to browse to a non-approved show on Crunchyroll redirects back to the CrunchyList landing page.
+- **Navigation is locked down.** Any attempt to browse to a non-approved show redirects back to the CrunchyList landing page.
 
 ## Install
 
 CrunchyList isn't on the Chrome Web Store yet. Install it manually in developer mode:
 
-1. **Download** — Clone this repo or [download the ZIP](../../archive/refs/heads/main.zip) and unzip it
-2. **Open Chrome Extensions** — Navigate to `chrome://extensions/`
-3. **Enable Developer Mode** — Toggle the switch in the top right
-4. **Load the extension** — Click "Load unpacked" and select the `extension/` folder (not the repo root)
-5. **Log into Crunchyroll** — Make sure the Chrome profile is logged into a Crunchyroll account
-6. **Set your PIN** — Open the options page (right-click the CrunchyList icon > **Options**, or go to `chrome://extensions`, click the three-dot menu on CrunchyList, and select **Options**). Create a 4-digit PIN
-7. **You're ready** — Open a new tab to see the landing page. SPY x FAMILY is included as a starter show. Add more from the options page.
+1. **Download**: Clone this repo or [download the ZIP](../../archive/refs/heads/main.zip) and unzip it
+2. **Open Chrome Extensions**: Navigate to `chrome://extensions/`
+3. **Enable Developer Mode**: Toggle the switch in the top right
+4. **Load the extension**: Click "Load unpacked" and select the `extension/` folder (not the repo root)
+5. **Log into Crunchyroll**: Make sure the Chrome profile is logged into a Crunchyroll account
+6. **Set your PIN**: Open the options page (right-click the CrunchyList icon > **Options**, or go to `chrome://extensions`, click the three-dot menu on CrunchyList, and select **Options**). Create a 4-digit PIN
+7. **You're ready**: Open a new tab to see the landing page. SPY x FAMILY is included as a starter show. Add more from the options page.
 
 ## Setup
 
 ### Adding Shows
 
-1. Open the CrunchyList options page — either right-click the extension icon and select **Options**, or go to `chrome://extensions`, click the three-dot menu (⋮) on CrunchyList, and select **Options**
+1. Open the CrunchyList options page: right-click the extension icon and select **Options**, or go to `chrome://extensions`, click the three-dot menu (⋮) on CrunchyList, and select **Options**
 2. Enter your 4-digit PIN
 3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family`)
 4. The title and poster image are fetched automatically
@@ -62,9 +62,9 @@ What's preserved:
 
 ## How Navigation Enforcement Works
 
-- **Series pages** (`/series/{ID}`) — allowed if the series ID is in the whitelist
-- **Watch pages** (`/watch/{ID}`) — allowed via lazy whitelisting (if the kid navigated from an approved series page) with a fallback check using page metadata
-- **Everything else** on crunchyroll.com — redirects to the CrunchyList landing page
+- **Series pages** (`/series/{ID}`): allowed if the series ID is in the whitelist
+- **Watch pages** (`/watch/{ID}`): allowed via lazy whitelisting (if the kid navigated from an approved series page) with a fallback check using page metadata
+- **Everything else** on crunchyroll.com: redirects to the CrunchyList landing page
 
 The extension only controls `crunchyroll.com`. It cannot block other websites. For a fully locked-down experience, see [Browser Hardening](#browser-hardening) below.
 
@@ -82,7 +82,7 @@ This is optional and outside the extension itself. See the [Chrome Enterprise po
 ## Technical Details
 
 - **Manifest V3** Chrome extension
-- **No build step, no bundler, no dependencies** — pure vanilla JS/HTML/CSS
+- **No build step, no bundler, no dependencies.** Pure vanilla JS/HTML/CSS
 - **Storage**: Whitelist metadata in `chrome.storage.sync` (syncs across devices), images and PIN hash in `chrome.storage.local`
 - **Content hiding**: CSS injection at `document_start` (no flicker) + DOM cleanup via MutationObserver at `document_idle`
 - **Image fetching**: Uses Crunchyroll's public CMS API to pull poster art
