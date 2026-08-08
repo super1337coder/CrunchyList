@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,11 +47,16 @@ private val Orange = Color(0xFFF47521)
 fun ShowTile(
     show: Show,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFocused: () -> Unit = {}
 ) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     val scale by animateFloatAsState(if (focused) 1.08f else 1f, label = "tileScale")
+
+    // Drives the detail panel. Keyed on `focused` so it fires on the transition
+    // rather than on every recomposition.
+    LaunchedEffect(focused) { if (focused) onFocused() }
 
     Column(
         modifier = modifier

@@ -96,12 +96,21 @@ class WhitelistStore private constructor(context: Context) {
                     put("title", s.title)
                     put("imageUrl", s.imageUrl ?: JSONObject.NULL)
                     put("dateAdded", s.dateAdded)
+                    put("category", s.category)
+                    put("hook", s.hook)
+                    put("description", s.description)
+                    put("meta", s.meta)
                 }
             )
         }
         return arr.toString()
     }
 
+    /**
+     * All text fields default to empty, so a whitelist written by an older build —
+     * or a show the parent added by pasting a URL — decodes fine and simply has no
+     * blurb to show.
+     */
     private fun decode(raw: String): List<Show> {
         val arr = JSONArray(raw)
         return (0 until arr.length()).mapNotNull { i ->
@@ -111,7 +120,11 @@ class WhitelistStore private constructor(context: Context) {
                 seriesId = id,
                 title = o.optString("title", id),
                 imageUrl = o.optString("imageUrl").takeIf { it.isNotBlank() && it != "null" },
-                dateAdded = o.optString("dateAdded", "")
+                dateAdded = o.optString("dateAdded", ""),
+                category = o.optString("category", ""),
+                hook = o.optString("hook", ""),
+                description = o.optString("description", ""),
+                meta = o.optString("meta", "")
             )
         }
     }

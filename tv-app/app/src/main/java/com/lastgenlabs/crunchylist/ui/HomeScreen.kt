@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -22,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,13 +50,24 @@ private val OVERSCAN_V = 36.dp
 /**
  * Tile width floor.
  *
- * GridCells.Adaptive fits floor((w + gap) / (min + gap)) columns, so this has to
- * sit just under the boundary: at 1080p/320dpi with these margins, 150.dp yields
- * four columns and 140.dp yields five. Five keeps the posters comfortably large
- * for a young kid while letting the next row peek — which is how a TV signals
- * "there's more below", there being no cursor to reveal a scrollbar.
+ * GridCells.Adaptive fits floor((w + gap) / (min + gap)) columns, so this sits
+ * just under a boundary and the two constants below are a pair — changing either
+ * silently changes the column count.
+ *
+ * At 1080p/320dpi with these margins the grid gets ~420dp beside the panel, which
+ * this floor turns into three columns. Raising it to 140.dp drops that to two,
+ * which is too cramped for 27 shows.
  */
-private val TILE_MIN_WIDTH = 140.dp
+private val TILE_MIN_WIDTH = 120.dp
+
+/**
+ * Detail panel width.
+ *
+ * ~40 characters a line at 17sp, which is about the comfortable limit for reading
+ * prose across a room. Narrower than this and the text starts to feel like a
+ * column of confetti; wider and the grid loses a column.
+ */
+private val PANEL_WIDTH = 400.dp
 
 /**
  * The kid-facing screen: nothing but parent-approved shows.
@@ -88,7 +104,36 @@ fun HomeScreen(
         if (shows.isEmpty()) {
             EmptyState()
         } else {
-            ShowGrid(shows = shows, onShowClick = onShowClick)
+            var focused by remember { mutableStateOf(shows.firstOrNull()) }
+
+            // If the whitelist changes under us, don't keep describing a show that
+            // is no longer on screen.
+            LaunchedEffect(shows) {
+                if (focused == null || shows.none { it.seriesId == focused?.seriesId }) {
+                    focused = shows.firstOrNull()
+                }
+            }
+
+            val anyBlurbs = remember(shows) { shows.any { it.hasBlurb } }
+
+            Row(modifier = Modifier.fillMaxSize()) {
+                ShowGrid(
+                    shows = shows,
+                    onShowClick = onShowClick,
+                    onShowFocused = { focused = it },
+                    modifier = Modifier.weight(1f)
+                )
+                // Only spend the space when there is something to put in it. A
+                // whitelist built entirely by pasting URLs has no write-ups, and a
+                // permanently empty panel would just be a narrower grid for nothing.
+                if (anyBlurbs) {
+                    Spacer(Modifier.width(28.dp))
+                    ShowDetailPanel(
+                        show = focused,
+                        modifier = Modifier.width(PANEL_WIDTH)
+                    )
+                }
+            }
         }
     }
 }
@@ -142,7 +187,12 @@ private fun Header(guardActive: Boolean, onSettings: () -> Unit) {
 }
 
 @Composable
-private fun ShowGrid(shows: List<Show>, onShowClick: (Show) -> Unit) {
+private fun ShowGrid(
+    shows: List<Show>,
+    onShowClick: (Show) -> Unit,
+    onShowFocused: (Show) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val firstTile = remember { FocusRequester() }
 
     // Nothing is focused by default on TV — without this the D-pad does nothing.
@@ -156,12 +206,13 @@ private fun ShowGrid(shows: List<Show>, onShowClick: (Show) -> Unit) {
         verticalArrangement = Arrangement.spacedBy(20.dp),
         // Room for the focused tile to grow without being clipped by the viewport.
         contentPadding = PaddingValues(bottom = 40.dp),
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxHeight()
     ) {
         itemsIndexed(shows, key = { _, show -> show.seriesId }) { index, show ->
             ShowTile(
                 show = show,
                 onClick = { onShowClick(show) },
+                onFocused = { onShowFocused(show) },
                 modifier = if (index == 0) Modifier.focusRequester(firstTile) else Modifier
             )
         }
