@@ -75,15 +75,15 @@ class GuardService : Service() {
         val fg = watcher.current() ?: return
 
         when (policy.classify(fg.packageName, fg.className)) {
-            ScreenPolicy.Verdict.IGNORE -> Unit
+            ScreenClassifier.Verdict.IGNORE -> Unit
 
-            ScreenPolicy.Verdict.ALLOW -> {
+            ScreenClassifier.Verdict.ALLOW -> {
                 // Reaching an approved screen ends any pending grace early: the
                 // launch we were waiting on has landed.
                 LaunchGrace.clear()
             }
 
-            ScreenPolicy.Verdict.BOUNCE -> {
+            ScreenClassifier.Verdict.BOUNCE -> {
                 if (LaunchGrace.isActive()) {
                     // One of our own deep links is still in flight. A legitimate
                     // launch transits Startup/Main on its way to the show page, and
@@ -196,9 +196,9 @@ class GuardService : Service() {
             false
         }
 
-        fun stop(context: Context) {
-            context.stopService(Intent(context, GuardService::class.java))
-        }
+        // NOTE: no stop() helper. Nothing should casually switch the guard off, and
+        // an unused one is an invitation. Force-stopping the app is the honest way,
+        // and Application.onCreate re-arms on next launch.
     }
 }
 

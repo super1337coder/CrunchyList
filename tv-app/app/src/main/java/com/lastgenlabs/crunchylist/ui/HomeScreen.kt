@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lastgenlabs.crunchylist.data.Show
+import kotlinx.coroutines.delay
 
 private val Bg = Color(0xFF101014)
 private val Orange = Color(0xFFF47521)
@@ -47,6 +48,8 @@ private val Orange = Color(0xFFF47521)
 fun HomeScreen(
     shows: List<Show>,
     guardActive: Boolean,
+    wasBounced: Boolean,
+    onBounceMessageShown: () -> Unit,
     onShowClick: (Show) -> Unit,
     onSettings: () -> Unit
 ) {
@@ -58,12 +61,34 @@ fun HomeScreen(
     ) {
         Header(guardActive = guardActive, onSettings = onSettings)
 
+        // Being teleported out of Crunchyroll with no explanation is baffling —
+        // especially for a kid, who has no idea an app just did that. Say so, then
+        // get out of the way.
+        if (wasBounced) {
+            BounceNotice(onDismissed = onBounceMessageShown)
+        }
+
         if (shows.isEmpty()) {
             EmptyState()
         } else {
             ShowGrid(shows = shows, onShowClick = onShowClick)
         }
     }
+}
+
+@Composable
+private fun BounceNotice(onDismissed: () -> Unit) {
+    LaunchedEffect(Unit) {
+        delay(4_000)
+        onDismissed()
+    }
+    Text(
+        text = "Let's pick a show from your list 👋",
+        color = Orange,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
 }
 
 @Composable

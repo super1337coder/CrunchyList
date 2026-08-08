@@ -18,28 +18,6 @@ class ScreenPolicy(context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("guard", Context.MODE_PRIVATE)
 
-    enum class Verdict {
-        /** An approved Crunchyroll screen. Leave it alone. */
-        ALLOW,
-
-        /** Crunchyroll, but somewhere the kid shouldn't be. Bounce. */
-        BOUNCE,
-
-        /** Not Crunchyroll at all — CrunchyList itself, the system UI, anything else. */
-        IGNORE
-    }
-
-    /**
-     * Substrings identifying approved screens. Matched against the activity class
-     * name rather than pinned to a fully-qualified name, so a package reshuffle
-     * like `.ui.showdetails.DetailsActivity` still matches.
-     *
-     * Calibration (§4.2.4) can add exact learned names on top of these, which is
-     * what keeps the guard working if Crunchyroll ever ships obfuscated classes
-     * where these substrings no longer appear.
-     */
-    private val approvedShapes = listOf("ShowDetails", "Player")
-
     /**
      * Class names learned by calibration — exact matches, no heuristics.
      * Survives obfuscation because it never needs to know what the class means.
@@ -58,28 +36,15 @@ class ScreenPolicy(context: Context) {
         learnedApproved = learnedApproved + className
     }
 
-    fun clearLearned() {
-        prefs.edit().remove(KEY_LEARNED).remove(KEY_CAL_VERSION).apply()
-    }
-
     /** True when Crunchyroll has been updated since calibration last ran. */
     fun needsCalibration(context: Context): Boolean {
         val current = Crunchyroll.versionCode(context) ?: return false
         return current != calibratedForVersion
     }
 
-    fun classify(packageName: String?, className: String?): Verdict {
-        if (packageName != Crunchyroll.PACKAGE) return Verdict.IGNORE
-
-        // Crunchyroll is in the foreground but we can't tell which screen.
-        // Fail closed.
-        if (className.isNullOrBlank()) return Verdict.BOUNCE
-
-        if (className in learnedApproved) return Verdict.ALLOW
-        if (approvedShapes.any { className.contains(it, ignoreCase = true) }) return Verdict.ALLOW
-
-        return Verdict.BOUNCE
-    }
+    /** Delegates to [ScreenClassifier] so the decision has one testable home. */
+    fun classify(packageName: String?, className: String?): ScreenClassifier.Verdict =
+        ScreenClassifier.classify(packageName, className, learnedApproved)
 
     private companion object {
         const val KEY_LEARNED = "learned_approved_classes"

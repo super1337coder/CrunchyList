@@ -51,8 +51,10 @@ class ForegroundWatcher(context: Context) {
         return latest
     }
 
-    /** True when we can actually read usage stats — used to surface a setup prompt. */
-    fun hasAccess(): Boolean = current(windowMs = 60_000L) != null
+    // NOTE: deliberately no hasAccess() helper here. An earlier one inferred access
+    // from "current() returned non-null", which conflates "no permission" with
+    // "nothing resumed recently" — a check that reports healthy on a quiet device
+    // with no permission at all. GuardPermissions asks the system directly.
 
     private companion object {
         // Long enough to survive a slow poll or a quiet moment, short enough that a

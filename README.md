@@ -53,6 +53,24 @@ adb shell appops set com.lastgenlabs.crunchylist SYSTEM_ALERT_WINDOW allow
 
 Open CrunchyList, set a parent PIN, and add shows by pasting a Crunchyroll series URL. Titles and poster art are fetched automatically.
 
+### Verifying it actually works
+
+Two suites, because they catch different things.
+
+**Unit tests** — the decision logic (fail-closed rules, calibration safety, URI grammar, ID parsing):
+
+```bash
+bash tv-app/build.sh testDebugUnitTest
+```
+
+**Behavioural verification** — whether the guard is *really* protecting the device. Unit tests cannot tell you the guard isn't running, isn't allowed to bounce, or didn't survive an update — and every serious bug in this project failed in exactly that way, with the app still reporting itself healthy:
+
+```bash
+bash tools/verify-guard.sh
+```
+
+It asserts only on observable behaviour and never trusts the app's own status text. Run it after any Crunchyroll update. A failure means the TV is not protected, whatever the screen says.
+
 > **Note:** `tv-app/build.sh` is a wrapper, not decoration — it redirects `TEMP` before starting the JVM. See the Gradle gotcha in the audit if you're curious why.
 
 ---

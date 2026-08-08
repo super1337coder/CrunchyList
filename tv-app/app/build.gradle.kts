@@ -56,4 +56,6 @@ dependencies {
 
     implementation(libs.androidx.tv.material)
     implementation(libs.coil.compose)
+
+    testImplementation(libs.junit)
 }

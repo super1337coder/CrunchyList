@@ -21,13 +21,10 @@ object Crunchyroll {
      *
      * PATH-ONLY. Do not add a host: `crunchyroll://www.crunchyroll.com/series/...`
      * silently lands on Crunchyroll's home screen instead of the series, with no
-     * error. Verified 2026-08-07.
+     * error at all. Verified 2026-08-07, and covered by a unit test precisely
+     * because the failure is invisible.
      */
-    fun seriesIntent(seriesId: String): Intent =
-        Intent(Intent.ACTION_VIEW, Uri.parse("crunchyroll://series/$seriesId")).apply {
-            setPackage(PACKAGE)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+    fun seriesUri(seriesId: String): String = "crunchyroll://series/$seriesId"
 
     /**
      * Deep link straight into playback of one episode.
@@ -35,8 +32,14 @@ object Crunchyroll {
      * Note the verb is `episode`, NOT `watch` — the web URL path says /watch/ but
      * `crunchyroll://watch/{id}` is not a route and falls back to the home screen.
      */
-    fun episodeIntent(episodeId: String): Intent =
-        Intent(Intent.ACTION_VIEW, Uri.parse("crunchyroll://episode/$episodeId")).apply {
+    fun episodeUri(episodeId: String): String = "crunchyroll://episode/$episodeId"
+
+    fun seriesIntent(seriesId: String): Intent = viewIntent(seriesUri(seriesId))
+
+    fun episodeIntent(episodeId: String): Intent = viewIntent(episodeUri(episodeId))
+
+    private fun viewIntent(uri: String): Intent =
+        Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
             setPackage(PACKAGE)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -73,18 +76,4 @@ object Crunchyroll {
         null
     }
 
-    /**
-     * Every activity Crunchyroll declares. Used by calibration to match approved
-     * screens by shape rather than by a hardcoded fully-qualified name.
-     */
-    fun declaredActivities(context: Context): List<String> = try {
-        val flags = PackageManager.GET_ACTIVITIES
-        context.packageManager.getPackageInfo(PACKAGE, flags)
-            .activities
-            ?.mapNotNull { it.name }
-            ?.filter { it.startsWith(PACKAGE) }
-            ?: emptyList()
-    } catch (_: Exception) {
-        emptyList()
-    }
 }

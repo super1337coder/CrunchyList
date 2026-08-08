@@ -47,29 +47,18 @@ class GuardCalibrator(private val context: Context) {
         val show = runCatching { phaseShow(referenceSeriesId) }.getOrNull()
             ?: return finish(false, "Crunchyroll never reached a show page.")
 
-        // THE safety rule. Learning is only safe if the candidate screen is
-        // reachable *exclusively* via the deep link — so it must not be any screen
-        // seen while Crunchyroll was opened normally, not merely different from the
-        // last one.
-        //
-        // An earlier version compared only the final class of each phase and
-        // "successfully" learned MainActivity — Crunchyroll's entire catalogue — as
-        // approved, because both phases had captured different transit screens
-        // before the app finished loading. That silently disables the whole filter,
-        // which is far worse than failing to calibrate.
-        if (show.settled in home.seen) {
-            return finish(
-                false,
-                "Couldn't tell the show page apart from Crunchyroll's own screens. " +
-                    "Nothing was changed — the guard is still using its existing rules."
-            )
+        // The safety rule lives in CalibrationRules so it can be unit-tested — see
+        // that file for why it is stated the way it is.
+        return when (val outcome = CalibrationRules.evaluate(show.settled, home.seen)) {
+            is CalibrationRules.Outcome.Reject -> finish(false, outcome.reason)
+
+            is CalibrationRules.Outcome.Learn -> {
+                policy.rememberApproved(outcome.className)
+                Crunchyroll.versionCode(context)?.let { policy.calibratedForVersion = it }
+                Log.i(TAG, "calibrated: approved=${outcome.className}; home phase saw ${home.seen}")
+                finish(true, "Verified. Approved screen: ${outcome.className.substringAfterLast('.')}")
+            }
         }
-
-        policy.rememberApproved(show.settled)
-        Crunchyroll.versionCode(context)?.let { policy.calibratedForVersion = it }
-
-        Log.i(TAG, "calibrated: approved=${show.settled}; home phase saw ${home.seen}")
-        return finish(true, "Verified. Approved screen: ${show.settled.substringAfterLast('.')}")
     }
 
     /** What a phase observed: where it ended up, and everything it passed through. */

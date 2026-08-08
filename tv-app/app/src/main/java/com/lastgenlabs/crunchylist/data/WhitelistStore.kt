@@ -33,10 +33,6 @@ class WhitelistStore private constructor(context: Context) {
         persist(_shows.value.filterNot { it.seriesId.equals(seriesId, ignoreCase = true) })
     }
 
-    fun update(show: Show) {
-        persist(_shows.value.map { if (it.seriesId == show.seriesId) show else it })
-    }
-
     /** A reference series for guard calibration — any entitled show will do. */
     fun anySeriesId(): String? = _shows.value.firstOrNull()?.seriesId
 

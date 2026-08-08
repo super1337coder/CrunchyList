@@ -10,8 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.MutableState
 import com.lastgenlabs.crunchylist.crunchyroll.Crunchyroll
+import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardPermissions
 import com.lastgenlabs.crunchylist.guard.GuardService
@@ -23,9 +24,17 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var store: WhitelistStore
 
+    /**
+     * Set when the guard brought us back rather than the kid navigating here.
+     * Hoisted out of Compose so [onNewIntent] can update it — this activity is
+     * singleTask, so a bounce arrives as a new intent, not a fresh onCreate.
+     */
+    private val bounced: MutableState<Boolean> = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         store = WhitelistStore.get(this)
+        bounced.value = intent?.getBooleanExtra(EXTRA_BOUNCED, false) == true
 
         setContent {
             val shows by store.shows.collectAsState()
@@ -34,6 +43,8 @@ class MainActivity : ComponentActivity() {
             HomeScreen(
                 shows = shows,
                 guardActive = guardActive,
+                wasBounced = bounced.value,
+                onBounceMessageShown = { bounced.value = false },
                 onShowClick = ::openShow,
                 onSettings = {
                     guardActive = GuardPermissions.allGranted(this)
@@ -43,7 +54,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun openShow(show: com.lastgenlabs.crunchylist.data.Show) {
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_BOUNCED, false)) bounced.value = true
+    }
+
+    private fun openShow(show: Show) {
         if (!Crunchyroll.isInstalled(this)) {
             Toast.makeText(this, "Crunchyroll isn't installed", Toast.LENGTH_LONG).show()
             return
