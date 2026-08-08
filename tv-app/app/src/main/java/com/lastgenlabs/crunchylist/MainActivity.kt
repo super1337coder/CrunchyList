@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.MutableState
 import com.lastgenlabs.crunchylist.crunchyroll.Crunchyroll
+import com.lastgenlabs.crunchylist.data.RecentlyPlayed
 import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardPermissions
@@ -24,6 +25,7 @@ import com.lastgenlabs.crunchylist.ui.HomeScreen
 class MainActivity : ComponentActivity() {
 
     private lateinit var store: WhitelistStore
+    private lateinit var recents: RecentlyPlayed
 
     /**
      * Set when the guard brought us back rather than the kid navigating here.
@@ -35,14 +37,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         store = WhitelistStore.get(this)
+        recents = RecentlyPlayed.get(this)
         bounced.value = intent?.getBooleanExtra(EXTRA_BOUNCED, false) == true
 
         setContent {
             val shows by store.shows.collectAsState()
+            val recentIds by recents.ids.collectAsState()
             var guardActive by remember { mutableStateOf(GuardPermissions.allGranted(this)) }
 
             HomeScreen(
                 shows = shows,
+                recentIds = recentIds,
                 guardActive = guardActive,
                 wasBounced = bounced.value,
                 onBounceMessageShown = { bounced.value = false },
@@ -75,6 +80,10 @@ class MainActivity : ComponentActivity() {
         //    which is what blocks Google TV's own "Continue watching" shortcuts.
         LaunchGrace.begin()
         SessionOrigin.beginApprovedSession()
+        // The only place a show is ever opened, so the only place worth recording
+        // it. Drives the Keep watching shelf — no API and no watch-history
+        // permission involved.
+        recents.record(show.seriesId)
         startActivity(Crunchyroll.seriesIntent(show.seriesId))
     }
 

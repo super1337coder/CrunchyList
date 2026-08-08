@@ -4,7 +4,7 @@ A parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.c
 
 A [Last Gen Labs](https://lastgenlabs.com) project.
 
-![CrunchyList on Google TV — a grid of parent-approved shows](screenshots/tv-app-home.png)
+![CrunchyList on Google TV — shelves of parent-approved shows](screenshots/tv-app-home.png)
 
 ## Two front ends
 
@@ -23,7 +23,11 @@ Crunchyroll's built-in parental controls are one blunt axis — "restrict mature
 
 ## The Google TV app
 
-**What the kids see:** a grid of approved shows with real poster art. Highlighting one shows a write-up of it beside the grid; selecting it offers **Play** and **More info**. Play opens Crunchyroll straight to that series — with its own resume state intact, so "Continue: E7" still works.
+**What the kids see:** shelves of approved shows with real poster art — **Keep watching** first, then a shelf per category. Highlighting one shows a write-up of it beside the shelves; selecting it offers **Play** and **More info**. Play opens Crunchyroll straight to that series — with its own resume state intact, so "Continue: E7" still works.
+
+**Keep watching** is built from the app's own launch history — no API, no watch-history permission, nothing to maintain. It matters more than it sounds: Crunchyroll's own Continue-watching row is one of the things the guard bounces, and coming back from an episode recreates the activity, so without it focus reset to the top of the alphabet after every single episode. Now you land back on what you were watching.
+
+**Surprise me**, in the header, picks a show at random and hands focus straight to Play. For when two kids can't agree.
 
 **More info** is a full page on the show: what it is actually about, and a portrait and a paragraph for each main character — who they are, what they can do, what they are like. It exists because deciding what to watch off a wall of poster art is hard, and because knowing a show before starting it is the difference between "no thanks" and "yes" for some kids.
 
@@ -219,9 +223,11 @@ CrunchyList/
 │           │   └── GuardCalibrator.kt     re-learns CR's screens by observation
 │           ├── crunchyroll/    #   deep links + CMS API
 │           ├── data/           #   whitelist storage
-│           │   └── SeedMerge.kt            membership is yours, text is the app's (pure, tested)
+│           │   ├── SeedMerge.kt            membership is yours, text is the app's (pure, tested)
+│           │   ├── Shelves.kt              Keep watching, then a shelf per category (pure, tested)
+│           │   └── RecentlyPlayed.kt       what's been watched, from our own launches
 │           ├── settings/       #   PIN-gated parent screen
-│           └── ui/             #   tile grid, detail panel, More Info
+│           └── ui/             #   shelves, detail panel, More Info
 │
 ├── extension/                  # LEGACY Chrome extension — see warning above
 │

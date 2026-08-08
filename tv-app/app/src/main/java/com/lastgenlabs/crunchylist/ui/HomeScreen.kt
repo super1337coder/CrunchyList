@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lastgenlabs.crunchylist.data.Shelves
 import com.lastgenlabs.crunchylist.data.Show
 import kotlinx.coroutines.delay
 
@@ -48,36 +49,34 @@ private val OVERSCAN_H = 56.dp
 private val OVERSCAN_V = 36.dp
 
 /**
- * Tile width floor.
+ * Tile width.
  *
- * GridCells.Adaptive fits floor((w + gap) / (min + gap)) columns, so this sits
- * just under a boundary and the two constants below are a pair — changing either
- * silently changes the column count.
- *
- * At 1080p/320dpi with these margins the grid gets ~420dp beside the panel, which
- * this floor turns into three columns. Raising it to 140.dp drops that to two,
- * which is too cramped for 27 shows.
+ * Fixed rather than adaptive now that shows sit in horizontally scrolling
+ * shelves: a shelf does not fit a whole number of tiles into its width, and
+ * should not try to. A partly visible tile at the right-hand edge is the thing
+ * that tells you the row continues.
  */
-private val TILE_MIN_WIDTH = 120.dp
+private val TILE_WIDTH = 104.dp
 
 /**
  * Detail panel width.
  *
  * ~40 characters a line at 17sp, which is about the comfortable limit for reading
- * prose across a room. Narrower than this and the text starts to feel like a
- * column of confetti; wider and the grid loses a column.
+ * prose across a room. Narrower and the text starts to feel like a column of
+ * confetti; wider and the shelves lose a tile.
  */
-private val PANEL_WIDTH = 400.dp
+private val PANEL_WIDTH = 360.dp
 
 /**
  * The kid-facing screen: nothing but parent-approved shows.
  *
- * This is the whole point of the product — the entry point is a curated grid
- * instead of Crunchyroll's full catalogue.
+ * This is the whole point of the product — the entry point is a curated set of
+ * shelves instead of Crunchyroll's full catalogue.
  */
 @Composable
 fun HomeScreen(
     shows: List<Show>,
+    recentIds: List<String>,
     guardActive: Boolean,
     wasBounced: Boolean,
     onBounceMessageShown: () -> Unit,
@@ -92,7 +91,41 @@ fun HomeScreen(
             // closer to the edge than this can simply not exist on the wall.
             .padding(horizontal = OVERSCAN_H, vertical = OVERSCAN_V)
     ) {
-        Header(guardActive = guardActive, onSettings = onSettings)
+        val playFocus = remember { FocusRequester() }
+        val shelves = remember(shows, recentIds) { Shelves.build(shows, recentIds) }
+        val anyBlurbs = remember(shows) { shows.any { it.hasBlurb } }
+
+        // Whatever the first shelf is, its first tile is where focus starts — so
+        // when there is a Keep watching row, coming back from an episode lands on
+        // the show you were just watching rather than at the top of the alphabet.
+        val opener = shelves.firstOrNull()?.shows?.firstOrNull()
+
+        var focused by remember { mutableStateOf(opener) }
+        var showingInfoFor by remember { mutableStateOf<Show?>(null) }
+
+        // If the whitelist changes under us, don't keep describing a show that is
+        // no longer on screen.
+        LaunchedEffect(shows, opener?.seriesId) {
+            if (focused == null || shows.none { it.seriesId == focused?.seriesId }) {
+                focused = opener
+            }
+        }
+
+        Header(
+            guardActive = guardActive,
+            canSurprise = shows.size > 1,
+            onSurprise = {
+                // Pick something other than what is already showing, so pressing
+                // it twice never looks like it did nothing.
+                focused = shows.filterNot { it.seriesId == focused?.seriesId }.randomOrNull()
+                    ?: focused
+                // Hand focus to Play so the pick can be watched immediately. It
+                // also means a second press comes from the panel rather than the
+                // header, which is a shorter loop for "no, another one".
+                if (anyBlurbs) runCatching { playFocus.requestFocus() }
+            },
+            onSettings = onSettings
+        )
 
         // Being teleported out of Crunchyroll with no explanation is baffling —
         // especially for a kid, who has no idea an app just did that. Say so, then
@@ -104,24 +137,9 @@ fun HomeScreen(
         if (shows.isEmpty()) {
             EmptyState()
         } else {
-            var focused by remember { mutableStateOf(shows.firstOrNull()) }
-            var showingInfoFor by remember { mutableStateOf<Show?>(null) }
-
-            // If the whitelist changes under us, don't keep describing a show that
-            // is no longer on screen.
-            LaunchedEffect(shows) {
-                if (focused == null || shows.none { it.seriesId == focused?.seriesId }) {
-                    focused = shows.firstOrNull()
-                }
-            }
-
-            val anyBlurbs = remember(shows) { shows.any { it.hasBlurb } }
-
-            val playFocus = remember { FocusRequester() }
-
             Row(modifier = Modifier.fillMaxSize()) {
-                ShowGrid(
-                    shows = shows,
+                ShelfList(
+                    shelves = shelves,
                     // Selecting a tile hands focus to the panel's Play button
                     // instead of launching. One more press to watch, but it puts
                     // the write-up and More info in front of you on the way —
@@ -141,7 +159,7 @@ fun HomeScreen(
                 )
                 // Only spend the space when there is something to put in it. A
                 // whitelist built entirely by pasting URLs has no write-ups, and a
-                // permanently empty panel would just be a narrower grid for nothing.
+                // permanently empty panel would just be narrower shelves for nothing.
                 if (anyBlurbs) {
                     Spacer(Modifier.width(28.dp))
                     ShowDetailPanel(
@@ -156,6 +174,62 @@ fun HomeScreen(
 
             showingInfoFor?.let { s ->
                 MoreInfoDialog(show = s, onDismiss = { showingInfoFor = null })
+            }
+        }
+    }
+}
+
+@Composable
+private fun ShelfList(
+    shelves: List<Shelves.Shelf>,
+    onShowClick: (Show) -> Unit,
+    onShowFocused: (Show) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val firstTile = remember { FocusRequester() }
+
+    // Nothing is focused by default on TV — without this the D-pad does nothing.
+    LaunchedEffect(shelves.firstOrNull()?.shows?.firstOrNull()?.seriesId) {
+        if (shelves.isNotEmpty()) runCatching { firstTile.requestFocus() }
+    }
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(18.dp),
+        // A lazy list clips to its bounds, and the focused tile scales up — so
+        // without room at both ends the top and bottom shelves get shaved.
+        contentPadding = PaddingValues(top = 8.dp, bottom = 40.dp),
+        modifier = modifier.fillMaxHeight()
+    ) {
+        itemsIndexed(shelves, key = { _, shelf -> shelf.title }) { row, shelf ->
+            Column {
+                Text(
+                    shelf.title.uppercase(),
+                    color = Orange,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.5.sp,
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    // The focused tile scales up, so it needs somewhere to grow
+                    // into at both ends of the row.
+                    contentPadding = PaddingValues(horizontal = 6.dp)
+                ) {
+                    itemsIndexed(shelf.shows, key = { _, show -> show.seriesId }) { col, show ->
+                        ShowTile(
+                            show = show,
+                            onClick = { onShowClick(show) },
+                            onFocused = { onShowFocused(show) },
+                            modifier = Modifier
+                                .width(TILE_WIDTH)
+                                .then(
+                                    if (row == 0 && col == 0) Modifier.focusRequester(firstTile)
+                                    else Modifier
+                                )
+                        )
+                    }
+                }
             }
         }
     }
@@ -177,7 +251,12 @@ private fun BounceNotice(onDismissed: () -> Unit) {
 }
 
 @Composable
-private fun Header(guardActive: Boolean, onSettings: () -> Unit) {
+private fun Header(
+    guardActive: Boolean,
+    canSurprise: Boolean,
+    onSurprise: () -> Unit,
+    onSettings: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,52 +271,26 @@ private fun Header(guardActive: Boolean, onSettings: () -> Unit) {
             fontWeight = FontWeight.Bold
         )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
             if (!guardActive) {
                 // Loud on purpose. A silently disabled guard is the failure mode
-                // that matters — the grid would otherwise look entirely normal.
+                // that matters — the shelves would otherwise look entirely normal.
                 Text(
                     text = "⚠  Guard off",
                     color = Color(0xFFE06C6C),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 24.dp)
+                    modifier = Modifier.padding(end = 10.dp)
                 )
             }
+            // For when two kids cannot agree, which is most evenings.
+            if (canSurprise) {
+                FocusableText(label = "🎲  Surprise me", onClick = onSurprise)
+            }
             FocusableText(label = "Settings", onClick = onSettings)
-        }
-    }
-}
-
-@Composable
-private fun ShowGrid(
-    shows: List<Show>,
-    onShowClick: (Show) -> Unit,
-    onShowFocused: (Show) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val firstTile = remember { FocusRequester() }
-
-    // Nothing is focused by default on TV — without this the D-pad does nothing.
-    LaunchedEffect(shows.firstOrNull()?.seriesId) {
-        if (shows.isNotEmpty()) runCatching { firstTile.requestFocus() }
-    }
-
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = TILE_MIN_WIDTH),
-        horizontalArrangement = Arrangement.spacedBy(28.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        // Room for the focused tile to grow without being clipped by the viewport.
-        contentPadding = PaddingValues(bottom = 40.dp),
-        modifier = modifier.fillMaxHeight()
-    ) {
-        itemsIndexed(shows, key = { _, show -> show.seriesId }) { index, show ->
-            ShowTile(
-                show = show,
-                onClick = { onShowClick(show) },
-                onFocused = { onShowFocused(show) },
-                modifier = if (index == 0) Modifier.focusRequester(firstTile) else Modifier
-            )
         }
     }
 }

@@ -11,10 +11,10 @@ this file is just current state and what's next.
 | | |
 |---|---|
 | Guard (the thing that makes this a parental control) | ✅ 10 behavioural checks pass |
-| Tile grid, detail panel, More Info screen | ✅ |
+| Shelves, Keep watching, Surprise me, detail panel, More Info | ✅ |
 | 29 shows seeded with art, long write-ups, cast, portraits and bios | ✅ |
-| Unit tests | ✅ 51 pass |
-| Signed release APK | ✅ `dist/`, tag `v0.1.1` pushed |
+| Unit tests | ✅ 68 pass |
+| Signed release APK | ✅ `dist/`, tag `v0.1.2` pushed |
 | GitHub release published | ❌ **needs your GitHub login** |
 | Tested on the physical Streamer | ❌ never |
 
@@ -23,18 +23,19 @@ JVM starts, working around AF_UNIX being blocked under `AppData\Local\Temp` on t
 
 ```bash
 bash tv-app/build.sh assembleDebug     # build
-bash tv-app/build.sh testDebugUnitTest # 51 unit tests
+bash tv-app/build.sh testDebugUnitTest # 68 unit tests
 bash tools/verify-guard.sh             # 10 behavioural checks, needs a device
-bash tools/release.sh v0.1.1           # signed APK + tag + publish
+bash tools/release.sh v0.1.2           # signed APK + tag + publish
 ```
 
 ## Next, roughly in order
 
-1. **Publish the v0.1.1 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
-   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.1` — notes
-   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.1.apk`. Or
-   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.1`.
+1. **Publish the v0.1.2 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
+   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.2` — notes
+   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.2.apk`. Or
+   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.2`.
    **Rebuild the APK first if commits have landed since.**
+   (`v0.1.1` is an earlier tag that was never published. Ignore it, or delete it.)
 
 2. **Test on the Streamer.** The specific unknown is whether the guard survives a real boot.
    Everything to date is emulator-only.
@@ -88,6 +89,9 @@ the things most likely to waste an hour.
   the More Info dialog. A `LazyColumn` with no focusable content simply will not move, and the
   content below the fold is unreachable. Panel content is sized to fit; the dialog takes focus
   itself and turns up/down into a scroll.
+- **Coming back from Crunchyroll recreates MainActivity.** The task ID changes, Compose state
+  is gone, and focus resets to the very first tile. Verified, not assumed. Keep watching is
+  what makes that survivable — the show you were just watching is the first tile.
 - **A Column measures unweighted children first.** In `ShowDetailPanel` the content had no
   weight, so it took the whole panel and the buttons under it were laid out past the bottom
   edge and clipped — on exactly the shows with the most to say. They were still focusable, so
