@@ -17,6 +17,7 @@ import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardPermissions
 import com.lastgenlabs.crunchylist.guard.GuardService
 import com.lastgenlabs.crunchylist.guard.LaunchGrace
+import com.lastgenlabs.crunchylist.guard.SessionOrigin
 import com.lastgenlabs.crunchylist.settings.SettingsActivity
 import com.lastgenlabs.crunchylist.ui.HomeScreen
 
@@ -65,10 +66,15 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Crunchyroll isn't installed", Toast.LENGTH_LONG).show()
             return
         }
-        // Grace MUST begin before the intent. A legitimate deep link transits
-        // Crunchyroll's Startup and Main activities, both of which are bounce
-        // triggers — without this the guard cancels its own navigation.
+        // Both markers must be set before the intent.
+        //  - LaunchGrace: a legitimate deep link transits Crunchyroll's Startup and
+        //    Main activities, both bounce triggers, so without it the guard cancels
+        //    its own navigation.
+        //  - SessionOrigin: tells the guard this Crunchyroll session came from an
+        //    approved tile. Without it the guard bounces Crunchyroll on sight,
+        //    which is what blocks Google TV's own "Continue watching" shortcuts.
         LaunchGrace.begin()
+        SessionOrigin.beginApprovedSession()
         startActivity(Crunchyroll.seriesIntent(show.seriesId))
     }
 

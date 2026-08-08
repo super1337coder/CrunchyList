@@ -74,9 +74,26 @@ class GuardService : Service() {
     private fun tick() {
         val fg = watcher.current() ?: return
 
-        when (policy.classify(fg.packageName, fg.className)) {
-            ScreenClassifier.Verdict.IGNORE -> Unit
+        val verdict = policy.classify(fg.packageName, fg.className)
 
+        if (verdict == ScreenClassifier.Verdict.IGNORE) {
+            // Something other than Crunchyroll is in front, so any Crunchyroll
+            // session is over. Coming back in must be justified again.
+            SessionOrigin.leftCrunchyroll()
+            return
+        }
+
+        // Crunchyroll reached without CrunchyList launching it — the Google TV home
+        // screen's "Continue watching" row does exactly this, straight into content
+        // nobody approved. The screen type is irrelevant here: an approved *kind* of
+        // screen showing an unapproved *show* is precisely the case the class-name
+        // check cannot see.
+        if (!SessionOrigin.isApproved() && !LaunchGrace.isActive()) {
+            bounce("${fg.className} (session not started by CrunchyList)")
+            return
+        }
+
+        when (verdict) {
             ScreenClassifier.Verdict.ALLOW -> {
                 // Reaching an approved screen ends any pending grace early: the
                 // launch we were waiting on has landed.
@@ -93,6 +110,8 @@ class GuardService : Service() {
                 }
                 bounce(fg.className)
             }
+
+            ScreenClassifier.Verdict.IGNORE -> Unit // handled above
         }
     }
 
@@ -100,6 +119,8 @@ class GuardService : Service() {
         val now = SystemClock.elapsedRealtime()
         if (now - lastBounceAt < BOUNCE_COOLDOWN_MS) return
         lastBounceAt = now
+        // Whatever that session was, it is over.
+        SessionOrigin.leftCrunchyroll()
 
         Log.i(TAG, "bouncing from ${fromClass ?: "<unknown>"}")
 

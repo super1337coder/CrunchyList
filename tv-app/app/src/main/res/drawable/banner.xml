@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    TV launcher banner. Android TV requires android:banner on the application
-    or the LEANBACK_LAUNCHER activity, else the app won't appear in the app row.
-    Nominal banner size is 320x180.
+    Google TV launcher banner.
+
+    Android TV requires android:banner on the application or the LEANBACK_LAUNCHER
+    activity, or the app never appears in the app row at all. Nominal size 320x180.
+
+    The mark is a short list of bars — a curated list, deliberately finite — with
+    the top one highlighted as the selected item. Chosen because it reads at a
+    glance from across a room and survives being scaled down to a launcher chip,
+    which a detailed illustration would not.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="320dp"
@@ -10,12 +16,34 @@
     android:viewportWidth="320"
     android:viewportHeight="180">
 
+    <!-- Backdrop -->
     <path
-        android:fillColor="#F47521"
+        android:fillColor="#141419"
         android:pathData="M0,0h320v180h-320z" />
 
-    <!-- Stylised 'C' -->
+    <!-- Warm wash behind the mark, so it doesn't read as a flat black chip -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M160,50 m-42,0 a42,42 0 1,0 42,42 a30,30 0 1,1 -30,-30 z" />
+        android:fillColor="#1E1A1C"
+        android:pathData="M0,0h150v180h-150z" />
+
+    <!-- Selected item: full-width, brand orange -->
+    <path
+        android:fillColor="#F47521"
+        android:pathData="M40,52 h74 a9,9 0 0 1 9,9 v14 a9,9 0 0 1 -9,9 h-74 a9,9 0 0 1 -9,-9 v-14 a9,9 0 0 1 9,-9 z" />
+
+    <!-- Remaining items, receding -->
+    <path
+        android:fillColor="#5A5A66"
+        android:pathData="M40,96 h56 a9,9 0 0 1 9,9 v13 a9,9 0 0 1 -9,9 h-56 a9,9 0 0 1 -9,-9 v-13 a9,9 0 0 1 9,-9 z" />
+    <path
+        android:fillColor="#3A3A44"
+        android:pathData="M40,138 h38 a8,8 0 0 1 8,8 v10 a8,8 0 0 1 -8,8 h-38 a8,8 0 0 1 -8,-8 v-10 a8,8 0 0 1 8,-8 z" />
+
+    <!-- Poster silhouettes on the right: what the list is a list *of* -->
+    <path
+        android:fillColor="#F47521"
+        android:pathData="M176,40 h44 a10,10 0 0 1 10,10 v80 a10,10 0 0 1 -10,10 h-44 a10,10 0 0 1 -10,-10 v-80 a10,10 0 0 1 10,-10 z" />
+    <path
+        android:fillColor="#8A5230"
+        android:pathData="M246,54 h40 a10,10 0 0 1 10,10 v66 a10,10 0 0 1 -10,10 h-40 a10,10 0 0 1 -10,-10 v-66 a10,10 0 0 1 10,-10 z" />
 </vector>

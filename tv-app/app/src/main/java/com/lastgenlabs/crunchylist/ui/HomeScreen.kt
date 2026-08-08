@@ -38,6 +38,21 @@ import kotlinx.coroutines.delay
 private val Bg = Color(0xFF101014)
 private val Orange = Color(0xFFF47521)
 
+/** TV-safe margins — roughly 5% of a 1080p panel, the usual overscan allowance. */
+private val OVERSCAN_H = 56.dp
+private val OVERSCAN_V = 36.dp
+
+/**
+ * Tile width floor.
+ *
+ * GridCells.Adaptive fits floor((w + gap) / (min + gap)) columns, so this has to
+ * sit just under the boundary: at 1080p/320dpi with these margins, 150.dp yields
+ * four columns and 140.dp yields five. Five keeps the posters comfortably large
+ * for a young kid while letting the next row peek — which is how a TV signals
+ * "there's more below", there being no cursor to reveal a scrollbar.
+ */
+private val TILE_MIN_WIDTH = 140.dp
+
 /**
  * The kid-facing screen: nothing but parent-approved shows.
  *
@@ -57,7 +72,9 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Bg)
-            .padding(horizontal = 48.dp, vertical = 32.dp)
+            // TV overscan. Many sets crop the outer ~5% of the panel, so anything
+            // closer to the edge than this can simply not exist on the wall.
+            .padding(horizontal = OVERSCAN_H, vertical = OVERSCAN_V)
     ) {
         Header(guardActive = guardActive, onSettings = onSettings)
 
@@ -134,10 +151,11 @@ private fun ShowGrid(shows: List<Show>, onShowClick: (Show) -> Unit) {
     }
 
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 180.dp),
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(bottom = 32.dp),
+        columns = GridCells.Adaptive(minSize = TILE_MIN_WIDTH),
+        horizontalArrangement = Arrangement.spacedBy(28.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        // Room for the focused tile to grow without being clipped by the viewport.
+        contentPadding = PaddingValues(bottom = 40.dp),
         modifier = Modifier.fillMaxSize()
     ) {
         itemsIndexed(shows, key = { _, show -> show.seriesId }) { index, show ->

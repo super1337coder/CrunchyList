@@ -130,9 +130,26 @@ adb shell "am start -a android.intent.action.VIEW -d 'crunchyroll://series/G4PH0
 sleep 14
 F="$(front)"
 case "$F" in
-    $PKG/*)        ok "externally-fired deep link is bounced (no grace granted)" ;;
-    *ShowDetails*) info "external deep link reached the show page — acceptable (it IS an approved screen)" ; PASS=$((PASS+1)) ;;
-    *)             bad "external deep link left Crunchyroll somewhere unapproved" "showing: $F" ;;
+    $PKG/*) ok "externally-fired deep link is bounced (no grace granted)" ;;
+    *)      bad "external deep link was not bounced" "showing: $F" ;;
+esac
+
+# THE case the screen-type check cannot see on its own: Google TV's own home
+# screen surfaces Crunchyroll content with Resume buttons, launching straight into
+# a show nobody approved. The `episode` route reaches PlayerActivity directly, and
+# PlayerActivity is an approved *kind* of screen — so only the session-origin check
+# stops this. Regression test for that.
+adb shell "am force-stop $CR" >/dev/null 2>&1
+open_app
+adb shell input keyevent KEYCODE_HOME >/dev/null 2>&1   # leave CrunchyList: session must clear
+sleep 5
+adb shell "am start -a android.intent.action.VIEW -d 'crunchyroll://episode/GZ7UVPVX5' $CR" >/dev/null 2>&1
+sleep 15
+F="$(front)"
+case "$F" in
+    $PKG/*) ok "Crunchyroll entered outside CrunchyList is bounced (unapproved session)" ;;
+    *)      bad "Crunchyroll was reached without going through CrunchyList" \
+                "showing: $F — a kid could resume ANY show from the Google TV home row" ;;
 esac
 
 # --- 4. surviving an update -------------------------------------------------

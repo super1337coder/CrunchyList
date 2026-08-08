@@ -89,7 +89,12 @@ fun ShowTile(
             color = if (focused) Color.White else Color(0xFFB8B8C0),
             fontSize = 16.sp,
             fontWeight = if (focused) FontWeight.Bold else FontWeight.Normal,
+            // Always reserve two lines. Without this, a one-line title sits at a
+            // different height from a wrapped one and the whole row looks broken —
+            // and the mismatch shifts as soon as the parent adds a long title.
+            minLines = 2,
             maxLines = 2,
+            lineHeight = 20.sp,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
             modifier = Modifier
