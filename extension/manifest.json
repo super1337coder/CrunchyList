@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CrunchyList",
   "version": "1.0.0",
-  "description": "Parent-curated, kid-safe front end for Crunchyroll. Only whitelisted shows are visible.",
+  "description": "LEGACY — superseded by the CrunchyList Google TV app. Known to fail open in several cases; do not rely on it to filter. See extension/README.md.",
   "permissions": [
     "storage",
     "webNavigation"
