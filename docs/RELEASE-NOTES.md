@@ -85,7 +85,8 @@ screen rather than pretending otherwise.
   change with any Crunchyroll update. The guard fails **closed** if they do — the app becomes
   unusable rather than unfiltered — and **Settings → Re-verify Crunchyroll** re-learns them by
   observation.
-- Tested on a Google TV emulator (Android 16 / API 36). Not yet tested on physical hardware.
+- Tested on a Google TV Streamer (Android 14) as well as the emulator. Verified across a cold
+  reboot: with nobody opening CrunchyList first, going straight to Crunchyroll still bounced.
 
 Run `bash tools/verify-guard.sh` against a device to confirm the guard is actually enforcing.
 It checks behaviour only and never trusts the app's own status text.

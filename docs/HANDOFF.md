@@ -17,7 +17,7 @@ verified end to end there as well as on the emulator.
 | Unit tests | ✅ 85 pass |
 | Signed release APK | ✅ `dist/`, tag `v0.1.3` pushed |
 | GitHub release published | ❌ **needs your GitHub login** |
-| Tested on the physical Streamer | ✅ 2026-08-08 — all 10 checks pass on hardware |
+| Tested on the physical Streamer | ✅ 2026-08-08 — all 10 checks pass, and survives a cold reboot |
 
 Build with `bash tv-app/build.sh` — **not** `gradlew` directly. It redirects `TEMP` before the
 JVM starts, working around AF_UNIX being blocked under `AppData\Local\Temp` on this machine.
@@ -31,22 +31,14 @@ bash tools/release.sh v0.1.3           # signed APK + tag + publish
 
 ## Next, roughly in order
 
-1. **Publish the v0.1.3 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
-   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.3` — notes
-   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.3.apk`. Or
-   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.3`.
-   **Rebuild the APK first if commits have landed since.**
-   (`v0.1.0`–`v0.1.2` are earlier tags that were never published and now point at code
-   with the first-play bounce in it. `git push origin :refs/tags/v0.1.0 :refs/tags/v0.1.1
+1. **Cut the next release with `bash tools/release.sh vX.Y.Z`.** It builds, checks the
+   signature, tags, pushes and publishes. v0.1.3 is live at
+   `https://github.com/super1337coder/CrunchyList/releases`.
+   (`v0.1.0`–`v0.1.2` are earlier tags that were never published and point at code with the
+   first-play bounce in it. `git push origin :refs/tags/v0.1.0 :refs/tags/v0.1.1
    :refs/tags/v0.1.2` clears them.)
 
-2. **The reboot test.** The one thing hardware has still not answered: does the guard come
-   back after the Streamer is power-cycled? On the emulator it does — `GuardService` was alive
-   before the app was opened. Check with the TV connected:
-   `adb -s <ip> shell dumpsys activity services com.lastgenlabs.crunchylist | grep -c ServiceRecord`
-   *before* opening CrunchyList.
-
-3. **Shows on hold** — see below. Demon Slayer is the nearest.
+2. **Shows on hold** — see below. Demon Slayer is the nearest.
 
 ## Shows: decided, held, and unavailable
 
@@ -99,8 +91,13 @@ adb pair 192.168.1.29:<pairing-port> <code>
 adb connect 192.168.1.29:<connect-port>
 ```
 
-The connect port changes on reboot; the pairing is one-time. Everything after that takes
-`-s <ip>:<port>`, because the emulator is usually attached too.
+**Wireless debugging switches itself off when the Streamer reboots**, and the connect port
+changes anyway — so expect to re-enable it and read a fresh port off the TV after any restart.
+The pairing itself is one-time and survives. Everything after that takes `-s <ip>:<port>`,
+because the emulator is usually attached too.
+
+There is another Android device on that network advertising adb at `192.168.1.21:5555`. Match
+on the Streamer's serial (`adb-57101HFAG11GAY`) rather than picking whatever mDNS offers.
 
 ## Traps that will bite again
 
