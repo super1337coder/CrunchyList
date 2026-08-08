@@ -32,3 +32,12 @@ tv-app/app/build/
 tv-app/local.properties
 *.iml
 .kotlin/
+
+# Release signing — the keystore itself lives outside the repo (~/.crunchylist/),
+# these patterns are belt-and-braces in case one is ever copied in.
+*.keystore
+*.jks
+keystore.properties
+
+# Built release artifacts
+dist/
