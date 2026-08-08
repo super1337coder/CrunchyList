@@ -21,6 +21,7 @@ import com.lastgenlabs.crunchylist.guard.GuardService
 class CrunchyListApp : Application() {
     override fun onCreate() {
         super.onCreate()
+
         if (!GuardPermissions.allGranted(this)) {
             Log.w(TAG, "guard not armed, missing: ${GuardPermissions.missing(this)}")
             return

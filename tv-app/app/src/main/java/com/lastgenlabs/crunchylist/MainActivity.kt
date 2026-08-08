@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        store = WhitelistStore(this)
+        store = WhitelistStore.get(this)
 
         setContent {
             val shows by store.shows.collectAsState()

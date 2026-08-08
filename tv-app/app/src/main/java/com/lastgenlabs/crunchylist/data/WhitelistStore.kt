@@ -14,7 +14,7 @@ import org.json.JSONObject
  * entries, read on every launch, and written rarely. A database would be more
  * machinery than the problem deserves.
  */
-class WhitelistStore(context: Context) {
+class WhitelistStore private constructor(context: Context) {
 
     private val prefs = context.applicationContext
         .getSharedPreferences("whitelist", Context.MODE_PRIVATE)
@@ -84,7 +84,24 @@ class WhitelistStore(context: Context) {
         }
     }
 
-    private companion object {
-        const val KEY = "shows_json"
+    companion object {
+        private const val KEY = "shows_json"
+
+        @Volatile
+        private var instance: WhitelistStore? = null
+
+        /**
+         * Process-wide singleton — this MUST be shared.
+         *
+         * Each instance owns a StateFlow seeded once at construction, so two
+         * instances silently diverge: adding a show in Settings updated its own
+         * copy while the home screen, holding a different instance, kept showing
+         * "No shows yet". The data was on disk the whole time; only the in-memory
+         * flow was stale.
+         */
+        fun get(context: Context): WhitelistStore =
+            instance ?: synchronized(this) {
+                instance ?: WhitelistStore(context.applicationContext).also { instance = it }
+            }
     }
 }

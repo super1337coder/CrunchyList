@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lastgenlabs.crunchylist.crunchyroll.Crunchyroll
 import com.lastgenlabs.crunchylist.crunchyroll.CrunchyrollApi
+import com.lastgenlabs.crunchylist.crunchyroll.TokenDiagnostics
 import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardCalibrator
@@ -59,7 +60,7 @@ class SettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val store = WhitelistStore(this)
+        val store = WhitelistStore.get(this)
         val pins = PinStore(this)
 
         setContent {
@@ -308,7 +309,18 @@ private fun SettingsScreen(
         }
 
         item {
-            TvButton("Restart guard") { GuardService.start(context) }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                TvButton("Test Crunchyroll connection") {
+                    if (busy) return@TvButton
+                    busy = true
+                    status = "Testing…"
+                    scope.launch {
+                        status = TokenDiagnostics.run()
+                        busy = false
+                    }
+                }
+                TvButton("Restart guard") { GuardService.start(context) }
+            }
         }
     }
 }

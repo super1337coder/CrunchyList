@@ -12,19 +12,29 @@ import java.net.URL
  * Fetches series titles and poster art from Crunchyroll's public CMS API.
  *
  * Ported from the Chrome extension's background.js, which is the one piece of it
- * worth keeping. Verified still working 2026-08-07.
+ * worth keeping.
  *
- * IMPORTANT: a browser User-Agent is required. Without one Cloudflare returns 403
- * and it looks exactly like a dead endpoint — that false alarm cost time during
- * the audit.
+ * DO NOT send a browser User-Agent from here. It is tempting — the extension used
+ * one, and a desktop `curl` needs one or Cloudflare 403s. On Android it does the
+ * opposite: measured 2026-08-07 with [TokenDiagnostics],
+ *
+ *     Chrome UA, minimal headers   -> 403
+ *     Chrome UA, full client hints -> 403
+ *     honest app UA                -> 200
+ *     okhttp/plain UA              -> 200
+ *     no UA at all                 -> 200
+ *
+ * Cloudflare is fingerprinting the client. Claiming to be Chrome while presenting
+ * Android's TLS/HTTP2 stack is a *mismatch*, and the mismatch is what gets blocked.
+ * Being honest about what we are sails straight through.
  */
 object CrunchyrollApi {
 
     private const val TAG = "CLApi"
     private const val TOKEN_URL = "https://www.crunchyroll.com/auth/v1/token"
-    private const val UA =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-            "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+
+    /** Honest client identity. See the class note — do not "fix" this to a browser UA. */
+    private const val UA = "CrunchyList/0.1 (Android TV; parental control) okhttp/4.12.0"
 
     data class SeriesInfo(val seriesId: String, val title: String?, val imageUrl: String?)
 
@@ -141,10 +151,8 @@ object CrunchyrollApi {
                 requestMethod = method
                 connectTimeout = 15_000
                 readTimeout = 15_000
-                // Cloudflare 403s anything without a browser UA.
                 setRequestProperty("User-Agent", UA)
                 setRequestProperty("Accept", "application/json")
-                setRequestProperty("Referer", "https://www.crunchyroll.com/")
                 headers.forEach { (k, v) -> setRequestProperty(k, v) }
                 if (body != null) {
                     doOutput = true

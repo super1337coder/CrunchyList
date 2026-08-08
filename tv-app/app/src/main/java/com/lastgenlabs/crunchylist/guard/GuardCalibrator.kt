@@ -65,15 +65,27 @@ class GuardCalibrator(private val context: Context) {
     /** Launch Crunchyroll the way the app menu would, and see where it lands. */
     private suspend fun phaseHome(): String? {
         val launch = context.packageManager.getLaunchIntentForPackage(Crunchyroll.PACKAGE)
-            ?: return null
-        context.startActivity(launch)
-        return awaitSettled()
+        if (launch == null) {
+            Log.w(TAG, "phaseHome: no launch intent for ${Crunchyroll.PACKAGE}")
+            return null
+        }
+        launch.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+        Log.i(TAG, "phaseHome: launching Crunchyroll")
+        runCatching { context.startActivity(launch) }
+            .onFailure { Log.w(TAG, "phaseHome: startActivity failed", it); return null }
+        val settled = awaitSettled()
+        Log.i(TAG, "phaseHome: settled on ${settled ?: "<nothing>"}")
+        return settled
     }
 
     /** Fire a known-good series deep link and see where it lands. */
     private suspend fun phaseShow(seriesId: String): String? {
-        context.startActivity(Crunchyroll.seriesIntent(seriesId))
-        return awaitSettled()
+        Log.i(TAG, "phaseShow: deep-linking to $seriesId")
+        runCatching { context.startActivity(Crunchyroll.seriesIntent(seriesId)) }
+            .onFailure { Log.w(TAG, "phaseShow: startActivity failed", it); return null }
+        val settled = awaitSettled()
+        Log.i(TAG, "phaseShow: settled on ${settled ?: "<nothing>"}")
+        return settled
     }
 
     /**
@@ -113,14 +125,22 @@ class GuardCalibrator(private val context: Context) {
 
     private fun finish(ok: Boolean, message: String): Result {
         LaunchGrace.clear()
-        // Always end calibration back on CrunchyList, never parked in Crunchyroll.
+        // Log every outcome, not just success. Calibration runs unattended-ish and
+        // navigates away from the screen showing its result, so a silent failure is
+        // invisible from both directions.
+        if (ok) Log.i(TAG, "calibration OK: $message") else Log.w(TAG, "calibration FAILED: $message")
+
+        // Return to Settings, not the home screen: Settings is where the result is
+        // displayed, and bouncing the parent to the grid throws the message away.
         runCatching {
             context.startActivity(
-                android.content.Intent(context, com.lastgenlabs.crunchylist.MainActivity::class.java)
-                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                android.content.Intent(
+                    context,
+                    com.lastgenlabs.crunchylist.settings.SettingsActivity::class.java
+                ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             )
-        }
+        }.onFailure { Log.w(TAG, "couldn't return to settings", it) }
         return Result(ok, message)
     }
 
