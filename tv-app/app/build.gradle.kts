@@ -32,8 +32,8 @@ android {
         // was added in Q. The Google TV Streamer runs Android 14 (API 34).
         minSdk = 29
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.1"
     }
 
     signingConfigs {
