@@ -51,7 +51,7 @@ adb shell appops set com.lastgenlabs.crunchylist GET_USAGE_STATS allow
 adb shell appops set com.lastgenlabs.crunchylist SYSTEM_ALERT_WINDOW allow
 ```
 
-Open CrunchyList, set a parent PIN, and add shows by pasting a Crunchyroll series URL. Titles and poster art are fetched automatically.
+Open CrunchyList and set a parent PIN. **The app ships with a curated starter list of 27 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) which seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
 
 ### Verifying it actually works
 
