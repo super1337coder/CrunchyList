@@ -77,7 +77,20 @@ It asserts only on observable behaviour and never trusts the app's own status te
 
 ## Chrome extension
 
-The original laptop-only version. Still functional, but it cannot get video to a TV.
+> ### ⚠️ Legacy — do not rely on this to filter anything
+>
+> This is the original laptop-only version, kept for reference. It is **a separate codebase
+> that shares no code with the TV app**, and none of the TV app's fixes were applied to it.
+>
+> The [2026-08 audit](docs/AUDIT-2026-08.md#3-code-audit) found it **fails open in five
+> places** — an empty whitelist allows all of Crunchyroll, `/watch/` URLs are never blocked by
+> the background script, the content script also fails open, series-ID extraction can approve
+> the wrong show via a recommendation link, and the lazy-whitelist state is lost whenever the
+> service worker sleeps.
+>
+> It runs. It does not reliably do what the rest of this section describes. **Use `tv-app/`.**
+
+The sections below document the extension as designed. Read them as intent, not as behaviour.
 
 ## How It Works
 
@@ -129,13 +142,17 @@ What's preserved:
 - Episode list and season selector
 - Watch progress indicators
 
-## How Navigation Enforcement Works
+## How Navigation Enforcement Was Meant To Work
 
 - **Series pages** (`/series/{ID}`): allowed if the series ID is in the whitelist
 - **Watch pages** (`/watch/{ID}`): allowed via lazy whitelisting (if the kid navigated from an approved series page) with a fallback check using page metadata
 - **Everything else** on crunchyroll.com: redirects to the CrunchyList landing page
 
-The extension only controls `crunchyroll.com`. It cannot block other websites. For a fully locked-down experience, see [Browser Hardening](#browser-hardening) below.
+**In practice none of the three holds reliably** — see the warning at the top of this section.
+Series pages are the only case that works as written, and only while the whitelist is
+non-empty.
+
+The extension also only controls `crunchyroll.com`. It cannot block other websites. For a fully locked-down experience, see [Browser Hardening](#browser-hardening) below.
 
 ## Browser Hardening
 
@@ -156,23 +173,42 @@ This is optional and outside the extension itself. See the [Chrome Enterprise po
 - **Content hiding**: CSS injection at `document_start` (no flicker) + DOM cleanup via MutationObserver at `document_idle`
 - **Image fetching**: Uses Crunchyroll's public CMS API to pull poster art
 
-## Project Structure
+---
+
+## Project structure
+
+Two independent front ends. They share no code — only the product idea and the shape of a
+whitelist record.
 
 ```
 CrunchyList/
-├── README.md
-├── .gitignore
-├── docs/
-│   └── CRUNCHYLIST-REQUIREMENTS.md
-└── extension/              # Load this folder in Chrome
-    ├── manifest.json
-    ├── background.js       # Navigation interception
-    ├── content.css         # CSS hiding (document_start)
-    ├── content.js          # DOM cleanup + watch page validation
-    ├── landing.html/js/css # Kid-facing tile grid
-    ├── options.html/js     # PIN-protected parent settings
-    ├── whitelist.json      # Default whitelist (SPY x FAMILY)
-    └── icons/
+├── tv-app/                     # THE PRODUCT — Google TV app (Kotlin, Compose for TV)
+│   ├── build.sh                #   build wrapper (redirects TEMP; see audit §6)
+│   └── app/src/main/
+│       ├── assets/default_whitelist.json   # curated starter list, seeds on first run
+│       └── java/com/lastgenlabs/crunchylist/
+│           ├── guard/          #   the part that makes this a parental control
+│           │   ├── GuardService.kt        foreground watcher + bounce
+│           │   ├── ScreenClassifier.kt    allow / bounce / ignore  (pure, tested)
+│           │   ├── SessionOrigin.kt       did CrunchyList start this session?
+│           │   ├── CalibrationRules.kt    what may be learned      (pure, tested)
+│           │   └── GuardCalibrator.kt     re-learns CR's screens by observation
+│           ├── crunchyroll/    #   deep links + CMS API
+│           ├── data/           #   whitelist storage
+│           ├── settings/       #   PIN-gated parent screen
+│           └── ui/             #   tile grid
+│
+├── extension/                  # LEGACY Chrome extension — see warning above
+│
+├── tools/
+│   ├── verify-guard.sh         # behavioural checks against a real device
+│   ├── probe-deeplinks.ps1     # re-derive the crunchyroll:// grammar
+│   └── probe-usagestats/       # guard feasibility probe (Gradle-free)
+│
+└── docs/
+    ├── AUDIT-2026-08.md        # design, every verified mechanism, every trap
+    ├── WATCHLIST.md            # the bundled list and what isn't on Crunchyroll
+    └── CRUNCHYLIST-REQUIREMENTS.md   # original spec (casting workflow now dead)
 ```
 
 ## License
