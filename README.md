@@ -1,14 +1,96 @@
 # CrunchyList
 
-A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch. Everything else is hidden.
+A parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch. Everything else is out of reach.
 
 A [Last Gen Labs](https://lastgenlabs.com) project.
 
-![CrunchyList landing page](screenshots/MainMenu.png)
+## Two front ends
+
+| | |
+|---|---|
+| **`tv-app/`** | **Google TV / Android TV app.** The active project. Runs on the TV itself — no computer involved. |
+| `extension/` | Chrome extension. Works, but only on the laptop it runs on. See [Chrome extension](#chrome-extension) below. |
+
+The extension came first and was abandoned when casting to the TV turned out to be impossible — Crunchyroll removed Chromecast from its web player, and its Widevine DRM blocks the Remote Playback API. The TV app takes a different route: it deep-links into Crunchyroll's own Android app, and enforces the whitelist with a background guard.
+
+See [docs/AUDIT-2026-08.md](docs/AUDIT-2026-08.md) for the full design, every mechanism verified by test, and the traps found along the way.
 
 ## The Problem
 
-Crunchyroll's built-in parental controls are too blunt. Either too much fan service gets through, or the filters are so tight that age-appropriate shows get blocked. CrunchyList solves this by letting a parent hand-pick exactly which series are allowed.
+Crunchyroll's built-in parental controls are one blunt axis — "restrict mature content". That lets through plenty of fan service while blocking things that are perfectly fine. The objection is orthogonal to the dial they give you, so no setting of it works. CrunchyList replaces the dial with an explicit list.
+
+## The Google TV app
+
+**What the kids see:** a grid of approved shows with real poster art. Pick one, and Crunchyroll opens straight to that series — with its own resume state intact, so "Continue: E7" still works.
+
+**What stops them wandering:** a background guard. Crunchyroll's app can otherwise be opened straight from the TV's app menu, and one Back press from a show lands in the full catalogue. The guard watches which activity is foreground and bounces back to CrunchyList whenever Crunchyroll shows anything that isn't an approved screen.
+
+It needs no AccessibilityService — it reads foreground activity via `UsageStatsManager` and returns to the front using a `SYSTEM_ALERT_WINDOW` background-launch exemption.
+
+**It fails closed.** Anything not positively recognised as an approved screen is bounced. If Crunchyroll renames its activities, CrunchyList becomes unusable rather than permissive — and a **Re-verify** button re-learns the new names by observation.
+
+### Setup
+
+Build and install:
+
+```bash
+bash tv-app/build.sh assembleDebug
+```
+
+```bash
+adb install -r tv-app/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Then grant the guard's two permissions. Neither is an install-time permission, so this step is required — without them CrunchyList filters nothing:
+
+```bash
+adb shell appops set com.lastgenlabs.crunchylist GET_USAGE_STATS allow
+```
+
+```bash
+adb shell appops set com.lastgenlabs.crunchylist SYSTEM_ALERT_WINDOW allow
+```
+
+Open CrunchyList and set a parent PIN. **The app ships with a curated starter list of 27 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) which seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
+
+### Verifying it actually works
+
+Two suites, because they catch different things.
+
+**Unit tests** — the decision logic (fail-closed rules, calibration safety, URI grammar, ID parsing):
+
+```bash
+bash tv-app/build.sh testDebugUnitTest
+```
+
+**Behavioural verification** — whether the guard is *really* protecting the device. Unit tests cannot tell you the guard isn't running, isn't allowed to bounce, or didn't survive an update — and every serious bug in this project failed in exactly that way, with the app still reporting itself healthy:
+
+```bash
+bash tools/verify-guard.sh
+```
+
+It asserts only on observable behaviour and never trusts the app's own status text. Run it after any Crunchyroll update. A failure means the TV is not protected, whatever the screen says.
+
+> **Note:** `tv-app/build.sh` is a wrapper, not decoration — it redirects `TEMP` before starting the JVM. See the Gradle gotcha in the audit if you're curious why.
+
+---
+
+## Chrome extension
+
+> ### ⚠️ Legacy — do not rely on this to filter anything
+>
+> This is the original laptop-only version, kept for reference. It is **a separate codebase
+> that shares no code with the TV app**, and none of the TV app's fixes were applied to it.
+>
+> The [2026-08 audit](docs/AUDIT-2026-08.md#3-code-audit) found it **fails open in five
+> places** — an empty whitelist allows all of Crunchyroll, `/watch/` URLs are never blocked by
+> the background script, the content script also fails open, series-ID extraction can approve
+> the wrong show via a recommendation link, and the lazy-whitelist state is lost whenever the
+> service worker sleeps.
+>
+> It runs. It does not reliably do what the rest of this section describes. **Use `tv-app/`.**
+
+The sections below document the extension as designed. Read them as intent, not as behaviour.
 
 ## How It Works
 
@@ -34,7 +116,7 @@ CrunchyList isn't on the Chrome Web Store yet. Install it manually in developer 
 
 1. Open the CrunchyList options page: right-click the extension icon and select **Options**, or go to `chrome://extensions`, click the three-dot menu (⋮) on CrunchyList, and select **Options**
 2. Enter your 4-digit PIN
-3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family`)
+3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family`)
 4. The title and poster image are fetched automatically
 5. Click **Add Show**
 
@@ -60,13 +142,17 @@ What's preserved:
 - Episode list and season selector
 - Watch progress indicators
 
-## How Navigation Enforcement Works
+## How Navigation Enforcement Was Meant To Work
 
 - **Series pages** (`/series/{ID}`): allowed if the series ID is in the whitelist
 - **Watch pages** (`/watch/{ID}`): allowed via lazy whitelisting (if the kid navigated from an approved series page) with a fallback check using page metadata
 - **Everything else** on crunchyroll.com: redirects to the CrunchyList landing page
 
-The extension only controls `crunchyroll.com`. It cannot block other websites. For a fully locked-down experience, see [Browser Hardening](#browser-hardening) below.
+**In practice none of the three holds reliably** — see the warning at the top of this section.
+Series pages are the only case that works as written, and only while the whitelist is
+non-empty.
+
+The extension also only controls `crunchyroll.com`. It cannot block other websites. For a fully locked-down experience, see [Browser Hardening](#browser-hardening) below.
 
 ## Browser Hardening
 
@@ -87,23 +173,42 @@ This is optional and outside the extension itself. See the [Chrome Enterprise po
 - **Content hiding**: CSS injection at `document_start` (no flicker) + DOM cleanup via MutationObserver at `document_idle`
 - **Image fetching**: Uses Crunchyroll's public CMS API to pull poster art
 
-## Project Structure
+---
+
+## Project structure
+
+Two independent front ends. They share no code — only the product idea and the shape of a
+whitelist record.
 
 ```
 CrunchyList/
-├── README.md
-├── .gitignore
-├── docs/
-│   └── CRUNCHYLIST-REQUIREMENTS.md
-└── extension/              # Load this folder in Chrome
-    ├── manifest.json
-    ├── background.js       # Navigation interception
-    ├── content.css         # CSS hiding (document_start)
-    ├── content.js          # DOM cleanup + watch page validation
-    ├── landing.html/js/css # Kid-facing tile grid
-    ├── options.html/js     # PIN-protected parent settings
-    ├── whitelist.json      # Default whitelist (SPY x FAMILY)
-    └── icons/
+├── tv-app/                     # THE PRODUCT — Google TV app (Kotlin, Compose for TV)
+│   ├── build.sh                #   build wrapper (redirects TEMP; see audit §6)
+│   └── app/src/main/
+│       ├── assets/default_whitelist.json   # curated starter list, seeds on first run
+│       └── java/com/lastgenlabs/crunchylist/
+│           ├── guard/          #   the part that makes this a parental control
+│           │   ├── GuardService.kt        foreground watcher + bounce
+│           │   ├── ScreenClassifier.kt    allow / bounce / ignore  (pure, tested)
+│           │   ├── SessionOrigin.kt       did CrunchyList start this session?
+│           │   ├── CalibrationRules.kt    what may be learned      (pure, tested)
+│           │   └── GuardCalibrator.kt     re-learns CR's screens by observation
+│           ├── crunchyroll/    #   deep links + CMS API
+│           ├── data/           #   whitelist storage
+│           ├── settings/       #   PIN-gated parent screen
+│           └── ui/             #   tile grid
+│
+├── extension/                  # LEGACY Chrome extension — see warning above
+│
+├── tools/
+│   ├── verify-guard.sh         # behavioural checks against a real device
+│   ├── probe-deeplinks.ps1     # re-derive the crunchyroll:// grammar
+│   └── probe-usagestats/       # guard feasibility probe (Gradle-free)
+│
+└── docs/
+    ├── AUDIT-2026-08.md        # design, every verified mechanism, every trap
+    ├── WATCHLIST.md            # the bundled list and what isn't on Crunchyroll
+    └── CRUNCHYLIST-REQUIREMENTS.md   # original spec (casting workflow now dead)
 ```
 
 ## License
