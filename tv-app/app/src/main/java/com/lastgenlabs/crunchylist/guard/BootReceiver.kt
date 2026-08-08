@@ -13,16 +13,26 @@ import android.util.Log
  */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
-            intent.action != Intent.ACTION_LOCKED_BOOT_COMPLETED
-        ) return
+        val handled = setOf(
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED
+        )
+        if (intent.action !in handled) return
 
         if (!GuardPermissions.allGranted(context)) {
             Log.w(TAG, "boot: guard not started, missing ${GuardPermissions.missing(context)}")
             return
         }
-        Log.i(TAG, "boot: starting guard")
-        GuardService.start(context)
+
+        // Must not throw. Android 12+ can refuse a foreground-service start from a
+        // broadcast receiver, and an uncaught ForegroundServiceStartNotAllowedException
+        // here crashes the app on every boot.
+        if (GuardService.start(context)) {
+            Log.i(TAG, "boot: guard started")
+        } else {
+            Log.w(TAG, "boot: system refused the guard start; it will arm when CrunchyList is opened")
+        }
     }
 
     private companion object {

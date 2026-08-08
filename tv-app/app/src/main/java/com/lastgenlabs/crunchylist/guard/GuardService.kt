@@ -175,9 +175,25 @@ class GuardService : Service() {
         /** Stops a bounce storm if a launch loops. */
         private const val BOUNCE_COOLDOWN_MS = 1_500L
 
-        fun start(context: Context) {
-            val intent = Intent(context, GuardService::class.java)
-            context.startForegroundService(intent)
+        /**
+         * Starts the guard, returning false if the system refused.
+         *
+         * Android 12+ blocks starting a foreground service from the background,
+         * and a `specialUse` service is not one of the exempt types — so this
+         * legitimately fails when called from [BootReceiver] on some builds. It
+         * must never crash the app: throwing here would take down the very thing
+         * that is supposed to be protecting the TV.
+         *
+         * When it does fail, opening CrunchyList re-arms the guard (MainActivity
+         * calls this from onResume, where the app is foreground and the start is
+         * always allowed).
+         */
+        fun start(context: Context): Boolean = try {
+            context.startForegroundService(Intent(context, GuardService::class.java))
+            true
+        } catch (t: Throwable) {
+            Log.w(TAG, "could not start guard: $t")
+            false
         }
 
         fun stop(context: Context) {
