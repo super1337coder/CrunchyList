@@ -126,7 +126,16 @@ fun HomeScreen(
                     // instead of launching. One more press to watch, but it puts
                     // the write-up and More info in front of you on the way —
                     // which is the point of having them.
-                    onShowClick = { runCatching { playFocus.requestFocus() } },
+                    //
+                    // Unless there is no panel. A whitelist built entirely by
+                    // pasting URLs has no write-ups, so nothing renders on the
+                    // right and there is no Play button to hand focus to —
+                    // selecting a tile would silently do nothing at all and the
+                    // app would look broken. Fall back to launching directly.
+                    onShowClick = { show ->
+                        if (anyBlurbs) runCatching { playFocus.requestFocus() }
+                        else onShowClick(show)
+                    },
                     onShowFocused = { focused = it },
                     modifier = Modifier.weight(1f)
                 )

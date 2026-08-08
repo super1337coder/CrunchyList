@@ -88,6 +88,13 @@ the things most likely to waste an hour.
   the More Info dialog. A `LazyColumn` with no focusable content simply will not move, and the
   content below the fold is unreachable. Panel content is sized to fit; the dialog takes focus
   itself and turns up/down into a scroll.
+- **A Column measures unweighted children first.** In `ShowDetailPanel` the content had no
+  weight, so it took the whole panel and the buttons under it were laid out past the bottom
+  edge and clipped — on exactly the shows with the most to say. They were still focusable, so
+  selecting one of those tiles handed focus to an invisible Play button and the remote appeared
+  to stop responding. The content is weighted now, and the description ellipsizes.
+- **Clipping is not truncation.** A `Text` that overflows its parent gets cut through a line of
+  type. Give it `weight(1f, fill = false)` and `TextOverflow.Ellipsis` so it trails off instead.
 - **`GridCells.Adaptive` sits on a boundary.** `TILE_MIN_WIDTH` and `PANEL_WIDTH` in
   `HomeScreen.kt` are a pair — changing either silently changes the column count.
 - **`getLaunchIntentForPackage()` returns null for TV apps.** They declare

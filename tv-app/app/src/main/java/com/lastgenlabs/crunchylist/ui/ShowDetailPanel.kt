@@ -69,10 +69,18 @@ fun ShowDetailPanel(
     ) {
         // Crossfade rather than slide: the panel changes on every focus move, and
         // anything more energetic turns browsing the grid into a strobe.
+        //
+        // The weight is load-bearing, not spacing. A Column measures unweighted
+        // children first, so without it this took the whole panel height and the
+        // buttons below were laid out past the bottom edge and clipped away — on
+        // exactly the shows with the most to say. Worse, they were still there as
+        // far as focus was concerned, so selecting a tile handed focus to an
+        // invisible Play button and the remote appeared to stop working.
         AnimatedContent(
             targetState = show,
             transitionSpec = { fadeIn(tween(160)) togetherWith fadeOut(tween(120)) },
-            label = "detail"
+            label = "detail",
+            modifier = Modifier.weight(1f)
         ) { s ->
             if (s == null) {
                 Text(
@@ -81,14 +89,14 @@ fun ShowDetailPanel(
                     fontSize = 17.sp
                 )
             } else {
-                // Everything is sized to FIT rather than to scroll. The panel is
-                // not focusable — focus stays in the grid so the D-pad keeps
-                // moving between shows — which means a scrollbar here would be
-                // unreachable and the tail of a long write-up simply unreadable.
-                // The scroll modifier stays only as a safety net for a longer
-                // blurb than any of these.
+                // Everything is sized to FIT, never to scroll. The panel is not
+                // focusable — focus stays in the grid so the D-pad keeps moving
+                // between shows — so a scrollbar here would be unreachable, and
+                // a scroll modifier only hides the overflow somewhere nobody can
+                // get to. Anything that does not fit is ellipsized instead, and
+                // More info has the whole thing.
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     if (s.category.isNotBlank()) {
@@ -127,11 +135,17 @@ fun ShowDetailPanel(
                     }
 
                     if (s.description.isNotBlank()) {
+                        // The one flexible element: it gets whatever is left after
+                        // the title, hook and meta have taken theirs, and trails
+                        // off rather than being cut through a line. fill = false
+                        // so a short blurb does not push meta to the floor.
                         Text(
                             s.description,
                             color = Body,
                             fontSize = 16.sp,
-                            lineHeight = 23.sp
+                            lineHeight = 23.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
                     }
 
@@ -149,7 +163,6 @@ fun ShowDetailPanel(
         }
 
         if (show != null) {
-            Spacer(Modifier.weight(1f))
             // Selecting a tile moves focus here rather than launching straight
             // away. The old design launched on tile-select, which made "More info"
             // reachable only by arrowing off the grid's last column — findable by
