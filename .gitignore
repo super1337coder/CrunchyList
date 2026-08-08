@@ -24,3 +24,11 @@ tools/probe-out/
 # Probe build artifacts / signing key
 tools/probe-usagestats/build/
 tools/probe-usagestats/debug.keystore
+
+# Android / Gradle (tv-app)
+tv-app/.gradle/
+tv-app/build/
+tv-app/app/build/
+tv-app/local.properties
+*.iml
+.kotlin/

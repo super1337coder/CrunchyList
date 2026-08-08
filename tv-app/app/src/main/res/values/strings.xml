@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CrunchyList</string>
+    <string name="guard_channel_name">Guard</string>
+    <string name="guard_notification_title">CrunchyList is watching</string>
+    <string name="guard_notification_text">Only approved shows can be opened.</string>
+</resources>
