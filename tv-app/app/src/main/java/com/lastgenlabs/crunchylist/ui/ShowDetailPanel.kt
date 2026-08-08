@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +56,8 @@ private val Dim = Color(0xFF8E8E9C)
 fun ShowDetailPanel(
     show: Show?,
     modifier: Modifier = Modifier,
+    playFocus: FocusRequester = remember { FocusRequester() },
+    onPlay: () -> Unit = {},
     onMoreInfo: () -> Unit = {}
 ) {
     Column(
@@ -143,29 +148,54 @@ fun ShowDetailPanel(
             }
         }
 
-        if (show?.hasMoreInfo == true) {
+        if (show != null) {
             Spacer(Modifier.weight(1f))
-            // Reachable by pressing right from the grid's last column. Kept at the
-            // bottom so it doesn't shift as blurbs change length.
-            MoreInfoButton(onClick = onMoreInfo)
+            // Selecting a tile moves focus here rather than launching straight
+            // away. The old design launched on tile-select, which made "More info"
+            // reachable only by arrowing off the grid's last column — findable by
+            // accident at best.
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(top = 14.dp)
+            ) {
+                PanelButton(
+                    label = "▶  Play",
+                    primary = true,
+                    modifier = Modifier.focusRequester(playFocus),
+                    onClick = onPlay
+                )
+                if (show.hasMoreInfo) {
+                    PanelButton(label = "More info", primary = false, onClick = onMoreInfo)
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun MoreInfoButton(onClick: () -> Unit) {
+private fun PanelButton(
+    label: String,
+    primary: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
 
+    val bg = when {
+        focused -> Orange
+        primary -> Color(0xFF3A2A1E)
+        else -> Color(0xFF262631)
+    }
+
     Text(
-        text = if (focused) "More info  ▸" else "More info",
+        text = label,
         color = if (focused) Color.Black else Body,
         fontSize = 17.sp,
-        fontWeight = if (focused) FontWeight.Bold else FontWeight.Normal,
-        modifier = Modifier
-            .padding(top = 14.dp)
+        fontWeight = if (focused || primary) FontWeight.Bold else FontWeight.Normal,
+        modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(if (focused) Orange else Color(0xFF262631))
+            .background(bg)
             .border(
                 width = if (focused) 3.dp else 0.dp,
                 color = if (focused) Color.White else Color.Transparent,

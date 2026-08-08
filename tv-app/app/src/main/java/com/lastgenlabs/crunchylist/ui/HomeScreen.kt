@@ -117,10 +117,16 @@ fun HomeScreen(
 
             val anyBlurbs = remember(shows) { shows.any { it.hasBlurb } }
 
+            val playFocus = remember { FocusRequester() }
+
             Row(modifier = Modifier.fillMaxSize()) {
                 ShowGrid(
                     shows = shows,
-                    onShowClick = onShowClick,
+                    // Selecting a tile hands focus to the panel's Play button
+                    // instead of launching. One more press to watch, but it puts
+                    // the write-up and More info in front of you on the way —
+                    // which is the point of having them.
+                    onShowClick = { runCatching { playFocus.requestFocus() } },
                     onShowFocused = { focused = it },
                     modifier = Modifier.weight(1f)
                 )
@@ -132,6 +138,8 @@ fun HomeScreen(
                     ShowDetailPanel(
                         show = focused,
                         modifier = Modifier.width(PANEL_WIDTH),
+                        playFocus = playFocus,
+                        onPlay = { focused?.let(onShowClick) },
                         onMoreInfo = { showingInfoFor = focused }
                     )
                 }

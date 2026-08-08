@@ -15,7 +15,7 @@ A [Last Gen Labs](https://lastgenlabs.com) project.
 
 The extension came first and was abandoned when casting to the TV turned out to be impossible — Crunchyroll removed Chromecast from its web player, and its Widevine DRM blocks the Remote Playback API. The TV app takes a different route: it deep-links into Crunchyroll's own Android app, and enforces the whitelist with a background guard.
 
-See [docs/AUDIT-2026-08.md](docs/AUDIT-2026-08.md) for the full design, every mechanism verified by test, and the traps found along the way.
+Current state and what is next: **[docs/HANDOFF.md](docs/HANDOFF.md)**. See [docs/AUDIT-2026-08.md](docs/AUDIT-2026-08.md) for the full design, every mechanism verified by test, and the traps found along the way.
 
 ## The Problem
 
