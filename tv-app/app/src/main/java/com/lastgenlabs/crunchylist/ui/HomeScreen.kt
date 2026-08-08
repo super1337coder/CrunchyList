@@ -105,6 +105,7 @@ fun HomeScreen(
             EmptyState()
         } else {
             var focused by remember { mutableStateOf(shows.firstOrNull()) }
+            var showingInfoFor by remember { mutableStateOf<Show?>(null) }
 
             // If the whitelist changes under us, don't keep describing a show that
             // is no longer on screen.
@@ -130,9 +131,14 @@ fun HomeScreen(
                     Spacer(Modifier.width(28.dp))
                     ShowDetailPanel(
                         show = focused,
-                        modifier = Modifier.width(PANEL_WIDTH)
+                        modifier = Modifier.width(PANEL_WIDTH),
+                        onMoreInfo = { showingInfoFor = focused }
                     )
                 }
+            }
+
+            showingInfoFor?.let { s ->
+                MoreInfoDialog(show = s, onDismiss = { showingInfoFor = null })
             }
         }
     }

@@ -1,16 +1,28 @@
 package com.lastgenlabs.crunchylist.data
 
 /**
+ * One main character, for the More Info screen.
+ *
+ * [role] is a one-line "who they are and what they do" — the thing a kid who
+ * likes knowing a show before starting it actually wants. Written by hand rather
+ * than scraped: the source data was inconsistent in voice, leaked wiki markup,
+ * and occasionally gave away plot.
+ */
+data class CastMember(
+    val name: String,
+    val role: String = "",
+    val image: String? = null
+)
+
+/**
  * One parent-approved series.
  *
  * [seriesId] is Crunchyroll's catalogue ID (e.g. "G4PH0WXVJ"). These are content
  * identifiers, not app internals — they survive Crunchyroll app updates, which is
  * why the whitelist itself carries no rename risk (audit §4.2.4).
  *
- * The four text fields are the parent's own words, not Crunchyroll's synopsis.
- * They are what lets a kid choose a show for a reason rather than by cover art,
- * and they are all optional — a show added by pasting a URL has none of them and
- * still works.
+ * Everything past [dateAdded] is optional. A show added by pasting a URL has none
+ * of it and still works; the UI just shows less.
  */
 data class Show(
     val seriesId: String,
@@ -28,9 +40,28 @@ data class Show(
     val description: String = "",
 
     /** Episode counts, seasons, which version this is — whatever is worth knowing. */
-    val meta: String = ""
+    val meta: String = "",
+
+    /** Factual line from Crunchyroll: "28 episodes   2 seasons   2023". */
+    val facts: String = "",
+
+    /** Crunchyroll's maturity rating, e.g. "TV-14". */
+    val rating: String = "",
+
+    /**
+     * Crunchyroll's own content labels, e.g. "Violence, Profanity, Smoking".
+     * These flag presence, not severity — useful, not a substitute for a parent
+     * having watched it.
+     */
+    val advisories: String = "",
+
+    val cast: List<CastMember> = emptyList()
 ) {
     /** True when there is anything worth showing in the detail panel. */
     val hasBlurb: Boolean
         get() = hook.isNotBlank() || description.isNotBlank()
+
+    /** True when the More Info screen would have anything beyond the panel. */
+    val hasMoreInfo: Boolean
+        get() = cast.isNotEmpty() || facts.isNotBlank() || advisories.isNotBlank()
 }

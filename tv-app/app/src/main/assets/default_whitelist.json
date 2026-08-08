@@ -7,7 +7,27 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you liked the party-of-adventurers feeling in Delicious in Dungeon.",
         "description":  "An elf wizard finishes the big quest, kills the demon king, and goes home. Then her human friends get old and die while she barely ages, and she realizes she never really got to know them. So she sets out again to fix that. Quiet and funny, with fights that come out of nowhere and hit hard.",
-        "meta":  "Season 1 is 28 episodes, season 2 is 10, and season 3 arrives in 2027."
+        "meta":  "Season 1 is 28 episodes, season 2 is 10, and season 3 arrives in 2027.",
+        "facts":  "38 episodes   2 seasons   2023",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Drug/Alcohol Use, Profanity",
+        "cast":  [
+                     {
+                         "name":  "Frieren",
+                         "role":  "An elf mage who outlived the friends she quested with",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b176754-PCnpqIOkjhFk.png"
+                     },
+                     {
+                         "name":  "Stark",
+                         "role":  "A young warrior who travels with them, braver than he feels",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b184313-CQl6GSt4RSny.jpg"
+                     },
+                     {
+                         "name":  "Fern",
+                         "role":  "Her human apprentice, and a better mage than she lets on",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b183965-uGFohBjlFoTp.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GT00258001",
@@ -17,7 +37,22 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you like a magic system with actual rules you could learn.",
         "description":  "Coco finds out that magic is not something you are born with. It is drawn, like handwriting, and anyone who learns the strokes can do it. Which is exactly why it is kept secret. She gets taken in as an apprentice at a workshop with three other girls who are all better at this than she is. The art is some of the best in any anime.",
-        "meta":  "13 episodes so far. A second season is being made."
+        "meta":  "13 episodes so far. A second season is being made.",
+        "facts":  "13 episodes   2026",
+        "rating":  "TV-14",
+        "advisories":  "Violence",
+        "cast":  [
+                     {
+                         "name":  "Coco",
+                         "role":  "A village girl who finds out magic is drawn, not inherited",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b129840-B2CVE0TIcKpT.png"
+                     },
+                     {
+                         "name":  "Qifrey",
+                         "role":  "The witch who takes her on as an apprentice",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b129841-brgGFuOv1h0n.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GRDQK39GY",
@@ -27,7 +62,42 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you want to be lied to by a show and then find out.",
         "description":  "A talking cat-thing offers a middle schooler any wish she wants, as long as she becomes a magical girl and fights monsters. It looks like a bright, cute show for small children. It is not.",
-        "meta":  "12 episodes."
+        "meta":  "12 episodes.",
+        "facts":  "12 episodes   2012",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Suicide",
+        "cast":  [
+                     {
+                         "name":  "Kyouko Sakura",
+                         "role":  "A magical girl who looks out for herself first",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b40006-zOwYYimuiO3m.png"
+                     },
+                     {
+                         "name":  "Kyuubey",
+                         "role":  "The small white creature making the offer",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b38566-XzE2iqAodRQK.jpg"
+                     },
+                     {
+                         "name":  "Homura Akemi",
+                         "role":  "A transfer student who tells her not to take it",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b38005-T3NR8p2f021x.jpg"
+                     },
+                     {
+                         "name":  "Sayaka Miki",
+                         "role":  "Madoka\u0027s best friend, and quicker to say yes",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b38395-d24OayatTB5h.jpg"
+                     },
+                     {
+                         "name":  "Mami Tomoe",
+                         "role":  "An older magical girl who shows them the ropes",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b38194-gnlnx4XN4HYP.jpg"
+                     },
+                     {
+                         "name":  "Madoka Kaname",
+                         "role":  "An eighth grader offered any wish she wants",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b37832-lzVj5IkUciLd.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "GRGGPG93R",
@@ -37,7 +107,22 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you want one story that starts strong and actually finishes.",
         "description":  "Two brothers try to bring their mother back with alchemy. It goes very wrong. One loses an arm and a leg, the other loses his entire body and ends up as a soul bound to a suit of armor. They join the military to find a way to fix it. The magic system has hard rules and the villains have real plans.",
-        "meta":  "64 episodes, one complete story, no filler."
+        "meta":  "64 episodes, one complete story, no filler.",
+        "facts":  "128 episodes   2 seasons   2009",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Alphonse Elric",
+                         "role":  "His younger brother, a soul bound to a suit of armour",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b12-tCKu8yK5kFL5.jpg"
+                     },
+                     {
+                         "name":  "Edward Elric",
+                         "role":  "A teenage State Alchemist with a metal arm and leg",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b11-TA5Nuk7EDUZG.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "GT00371630",
@@ -47,7 +132,22 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you want a mystery where the answer has been locked in the next room the whole time.",
         "description":  "Yuru is a village kid who hunts for a living, and his twin sister has spent her whole life locked in a cage. Nobody will tell him why. Then strangers arrive who can summon shadow creatures that come in bonded pairs, and it turns out the cage was never there to protect the village from her.",
-        "meta":  "Currently airing, 24 episodes planned. Written by the author of Fullmetal Alchemist."
+        "meta":  "Currently airing, 24 episodes planned. Written by the author of Fullmetal Alchemist.",
+        "facts":  "18 episodes   2026",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Smoking, Nudity",
+        "cast":  [
+                     {
+                         "name":  "Yuru",
+                         "role":  "A village boy who hunts for a living",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b270811-RA1UwUhCSFiF.png"
+                     },
+                     {
+                         "name":  "Asa",
+                         "role":  "His twin sister, kept locked in a cage her whole life",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b270810-RDnZzM4DtLyn.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GW4HM7WK9",
@@ -57,7 +157,17 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you like watching someone win with the one skill nobody respects.",
         "description":  "Will goes to a magic academy where your rank is your worth, and he cannot cast a single spell. What he can do is swing a sword hard enough to make that not matter. He is trying to reach the top of the Wizard\u0027s Tower because of a promise he made to a friend years ago.",
-        "meta":  "24 episodes over two seasons."
+        "meta":  "24 episodes over two seasons.",
+        "facts":  "25 episodes   2 seasons   2024",
+        "rating":  "TV-14",
+        "advisories":  "Violence",
+        "cast":  [
+                     {
+                         "name":  "Will Serfort",
+                         "role":  "A magic student who cannot cast, so he uses a sword",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b212394-LBHoN071nIuu.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GY3VKX1MR",
@@ -67,7 +177,32 @@
         "category":  "Action and fights",
         "hook":  "If you like fights that get won by planning instead of shouting.",
         "description":  "Gon is 12 and finds out that his father, who he was told was dead, is alive and is a famous Hunter who left to go do Hunter things. So Gon takes the Hunter exam, which turns out to be less of a test and more of a survival event. He makes a best friend who is a trained assassin his own age.",
-        "meta":  "148 episodes. Starts light and gets much heavier as it goes."
+        "meta":  "148 episodes. Starts light and gets much heavier as it goes.",
+        "facts":  "148 episodes   2011",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Gon Freecss",
+                         "role":  "Twelve years old, looking for the father who left",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b30-lyFExKyDhefc.jpg"
+                     },
+                     {
+                         "name":  "Leorio Paradinight",
+                         "role":  "Wants to be a doctor, needs the money first",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b29-RgzoSeKmDYzl.jpg"
+                     },
+                     {
+                         "name":  "Killua Zoldyck",
+                         "role":  "His best friend, raised by a family of assassins",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b27-Z5O02kQUydpT.jpg"
+                     },
+                     {
+                         "name":  "Kurapika",
+                         "role":  "The last of his clan, hunting the people who wiped it out",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b28-ivA7UGnfE40a.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GDKHZEP8W",
@@ -77,7 +212,37 @@
         "category":  "Action and fights",
         "hook":  "If you liked Sakamoto Days playing ridiculous action completely straight.",
         "description":  "A magic school where everyone casts spells, except Mash, who has no magic and has instead done an unreasonable number of push-ups. He solves every magical problem by punching it. It is a straight parody of Harry Potter and it commits completely.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "25 episodes   2 seasons   2023",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Finn Ames",
+                         "role":  "His first and very anxious friend at the academy",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b174368-tYxOTsrCDEk9.jpg"
+                     },
+                     {
+                         "name":  "Mash Burnedead",
+                         "role":  "Has no magic at all, so he punches the problem",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b158734-k8FAVIyXKdW1.jpg"
+                     },
+                     {
+                         "name":  "Lance Crown",
+                         "role":  "A serious rival student who takes ranking seriously",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b172075-aOsZuM7D0bcW.jpg"
+                     },
+                     {
+                         "name":  "Dot Barrett",
+                         "role":  "A loud classmate with a short temper",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b174369-VjKvYJbXLO5I.jpg"
+                     },
+                     {
+                         "name":  "Lemon Irvine",
+                         "role":  "A classmate with an obvious crush on Mash",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b167819-2pddKcJiApjD.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "G4PH0WXVJ",
@@ -87,7 +252,27 @@
         "category":  "Comedy",
         "hook":  "If you liked the comedy timing in Sakamoto Days.",
         "description":  "A spy has to fake having a family for a mission, so he adopts a kid and marries a stranger. What he does not know is that the kid can read minds and the wife is a professional assassin. Nobody tells anybody anything. Anya, the kid, knows all of it and mostly uses her mind reading to get out of homework.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "50 episodes   3 seasons   2022",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Loid Forger",
+                         "role":  "A psychiatrist, and secretly a master spy",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b138101-7NCB0Md8zA6G.png"
+                     },
+                     {
+                         "name":  "Yor Forger",
+                         "role":  "A city hall clerk, and secretly an assassin",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b138102-ZOAu9jI2d5ke.png"
+                     },
+                     {
+                         "name":  "Anya Forger",
+                         "role":  "Their adopted daughter, who secretly reads minds",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b138100-4Li0tWRCa5bQ.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "G5PHNM9P0",
@@ -97,7 +282,42 @@
         "category":  "Comedy",
         "hook":  "If you want a comedy that can switch to serious without warning.",
         "description":  "Nico is a witch doing her apprenticeship year, which means living with her childhood friend Morihito, who has been assigned to protect her. Her spells almost never do what she intends. From the author of Sket Dance, so the jokes come fast.",
-        "meta":  "24 episodes."
+        "meta":  "24 episodes.",
+        "facts":  "25 episodes   2025",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Smoking, Suggestive Dialogue",
+        "cast":  [
+                     {
+                         "name":  "Morihito Otogi",
+                         "role":  "Her childhood friend, an ogre assigned to protect her",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b207344-2LFtu73GjZsg.png"
+                     },
+                     {
+                         "name":  "Keigo Magami",
+                         "role":  "A classmate and self-declared hipster",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b265162-BkRabXvjfzWj.png"
+                     },
+                     {
+                         "name":  "Kanshi Kazamatsuri",
+                         "role":  "A tengu who is wary of Morihito",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b233739-KNQGNMvqGZfI.png"
+                     },
+                     {
+                         "name":  "Nico Wakatsuki",
+                         "role":  "A witch doing her apprenticeship year",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b207345-iXoH3SVekrw6.png"
+                     },
+                     {
+                         "name":  "Miharu Kiryuu",
+                         "role":  "A very polite vampire with no filter at all",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b266627-d9AX0oJkxMLV.png"
+                     },
+                     {
+                         "name":  "Nemu Miyao",
+                         "role":  "A witch who specialises in shape-shifting",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b253737-WsHYPntyvdFf.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "G79H23Z8P",
@@ -107,7 +327,17 @@
         "category":  "Games and science",
         "hook":  "If you like games, speedruns, or figuring out how systems break.",
         "description":  "Sunraku plays terrible video games on purpose, the buggier the better, because beating garbage is more fun than beating something good. Then he tries a real top-tier VR game and finds out his years of suffering through broken games made him weirdly overpowered.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "51 episodes   2 seasons   2023",
+        "rating":  "TV-14",
+        "advisories":  "Profanity, Violence, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Rakurou \"Sunraku\" Hizutome",
+                         "role":  "Plays terrible games on purpose, and got good at it",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b271367-RM6DwXf1D0gu.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GY8VM8MWY",
@@ -117,7 +347,22 @@
         "category":  "School and sports",
         "hook":  "Even if you do not care about sports.",
         "description":  "Volleyball. A short kid who can jump absurdly high teams up with a genius setter who he hates. That is the whole premise and it works. The matches are treated like life or death and the show fully commits to that.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "94 episodes   7 seasons   2014",
+        "rating":  "TV-14",
+        "advisories":  "Profanity",
+        "cast":  [
+                     {
+                         "name":  "Shouyou Hinata",
+                         "role":  "Short for a volleyball player, jumps absurdly high",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b64769-WoWlCMLLgJ14.png"
+                     },
+                     {
+                         "name":  "Tobio Kageyama",
+                         "role":  "A genius setter, and a difficult teammate",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b64771-BuCVs7B8bBdh.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GG5H5X3EE",
@@ -127,7 +372,27 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you liked Delicious in Dungeon and want the low-stakes version.",
         "description":  "A wizard kingdom summons four heroes and accidentally gets a fifth guy, an ordinary office worker whose only power is online grocery shopping from Japan. He gets thrown out of the palace, cooks himself dinner, and a legendary wolf shows up demanding to be fed. Then a slime. Then a baby dragon.",
-        "meta":  "12 episodes per season, two seasons. Made by MAPPA, so the food looks absurd."
+        "meta":  "12 episodes per season, two seasons. Made by MAPPA, so the food looks absurd.",
+        "facts":  "24 episodes   2 seasons   2023",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity",
+        "cast":  [
+                     {
+                         "name":  "Fel",
+                         "role":  "A legendary wolf who works in exchange for dinner",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b157882-gDh9ovbpFFuM.png"
+                     },
+                     {
+                         "name":  "Tsuyoshi Mukouda",
+                         "role":  "An office worker whose only power is online shopping",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b157881-uLcY9D0sFskw.png"
+                     },
+                     {
+                         "name":  "Sui",
+                         "role":  "A slime he takes in, cheerful and surprisingly strong",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b157879-m91XQAfn39Dx.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "G79H23W70",
@@ -137,7 +402,22 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you liked how Mob Psycho treats a main character everybody underestimates.",
         "description":  "Prince Bojji is deaf, cannot speak, and is physically the weakest person in the kingdom. Everyone assumes he will be a terrible king. His first real friend is a talking shadow. The art looks like a picture book and the story goes to much darker places than the art suggests.",
-        "meta":  "23 episodes."
+        "meta":  "23 episodes.",
+        "facts":  "33 episodes   2 seasons   2021",
+        "rating":  "TV-14",
+        "advisories":  "Violence",
+        "cast":  [
+                     {
+                         "name":  "Kage",
+                         "role":  "A living shadow, and his first real friend",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b209533-bICkAMcaURRi.png"
+                     },
+                     {
+                         "name":  "Bojji",
+                         "role":  "A prince who is deaf and cannot speak",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b209532-s7ciwKqKrIw7.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GYP58QMMY",
@@ -147,7 +427,32 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you like a hero whose entire thing is refusing to do the obvious.",
         "description":  "Vash the Stampede has a 60 billion double dollar bounty on his head and a reputation for flattening entire towns. He is also a cheerful idiot who refuses to kill anyone, ever, and most of the destruction around him is caused by the people chasing him. Desert planet, gunfights, a lot of jokes, and then it stops joking.",
-        "meta":  "This is the 1998 original."
+        "meta":  "This is the 1998 original.",
+        "facts":  "28 episodes   2 seasons   2018",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Nudity, Smoking, Drug/Alcohol Use, Suicide",
+        "cast":  [
+                     {
+                         "name":  "Milly Thompson",
+                         "role":  "Her cheerful, unflappable partner",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b714-bwscmKr1GkxW.jpg"
+                     },
+                     {
+                         "name":  "Vash the Stampede",
+                         "role":  "An outlaw with a huge bounty who refuses to kill anyone",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b162-kfdfqsX7Xjf0.png"
+                     },
+                     {
+                         "name":  "Meryl Stryfe",
+                         "role":  "An insurance agent assigned to follow him around",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b713-ARN91UwGfe3A.jpg"
+                     },
+                     {
+                         "name":  "Nicholas D. Wolfwood",
+                         "role":  "A priest carrying an enormous cross-shaped gun",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b722-Ernx5wHAXugB.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "GXJHM3PK5",
@@ -157,7 +462,32 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you like a hero whose entire thing is refusing to do the obvious.",
         "description":  "Vash the Stampede has a 60 billion double dollar bounty on his head and a reputation for flattening entire towns. He is also a cheerful idiot who refuses to kill anyone, ever, and most of the destruction around him is caused by the people chasing him. Desert planet, gunfights, a lot of jokes, and then it stops joking.",
-        "meta":  "The newer computer-animated version. Shorter and darker than the 1998 original."
+        "meta":  "The newer computer-animated version. Shorter and darker than the 1998 original.",
+        "facts":  "24 episodes   2 seasons   2026",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Smoking, Drug/Alcohol Use, Profanity, Blood/Gore",
+        "cast":  [
+                     {
+                         "name":  "Vash the Stampede",
+                         "role":  "An outlaw with a huge bounty who refuses to kill anyone",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b162-kfdfqsX7Xjf0.png"
+                     },
+                     {
+                         "name":  "Nicholas D. Wolfwood",
+                         "role":  "A priest carrying an enormous cross-shaped gun",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b722-Ernx5wHAXugB.jpg"
+                     },
+                     {
+                         "name":  "Meryl Stryfe",
+                         "role":  "A rookie reporter sent to find him",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b713-ARN91UwGfe3A.jpg"
+                     },
+                     {
+                         "name":  "Roberto De Niro",
+                         "role":  "A jaded reporter, and Meryl\u0027s minder",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b289467-EJy9Bu0qxyOX.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "G6793XKZY",
@@ -167,7 +497,22 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you would rather invent paper than live without books.",
         "description":  "A girl who loved books dies and wakes up in a fantasy world where books are handmade, absurdly expensive, and only nobles own them. So she decides to invent paper. Then ink. Then printing. It is a fantasy show about building an entire industry from nothing because you want something to read.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "59 episodes   7 seasons   2019",
+        "rating":  "TV-14",
+        "advisories":  "Suggestive Dialogue, Violence",
+        "cast":  [
+                     {
+                         "name":  "Myne",
+                         "role":  "A book lover reborn where books barely exist",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b126156-YXVZECJdjc00.png"
+                     },
+                     {
+                         "name":  "Lutz",
+                         "role":  "Her friend, an apprentice craftsman who believes her",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b126529-5BDbPIz2JbPE.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "G6VN35J7R",
@@ -177,7 +522,42 @@
         "category":  "Fantasy and adventure",
         "hook":  "If you want a main character who starts out useless and does not stay that way.",
         "description":  "A sheltered princess watches her father get killed and has to run for her life with one bodyguard. She goes from useless to genuinely dangerous over the course of the show, mostly by learning to shoot a bow and refusing to quit.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "24 episodes   2014",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Nudity, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Yona",
+                         "role":  "A sheltered princess forced to run for her life",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b43814-M0nlr2AP7vY0.png"
+                     },
+                     {
+                         "name":  "Hak Son",
+                         "role":  "Her bodyguard, and former general of the Wind Tribe",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b43815-WRbln8jA1mPk.jpg"
+                     },
+                     {
+                         "name":  "Yun",
+                         "role":  "The group\u0027s healer, sharp-tongued and very capable",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b67745-0oHMcSVNp7U5.jpg"
+                     },
+                     {
+                         "name":  "Ki-Ja",
+                         "role":  "The White Dragon, with one enormously powerful arm",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b67747-Epj21EmBa34y.jpg"
+                     },
+                     {
+                         "name":  "Shin-Ah",
+                         "role":  "The Blue Dragon, who can see for miles",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b67749-56bkWIb9ZpWy.jpg"
+                     },
+                     {
+                         "name":  "Jae-Ha",
+                         "role":  "The Green Dragon, who can leap almost like flying",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b67751-wfoNe4W9UHTc.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GG5H5XQ7D",
@@ -187,7 +567,27 @@
         "category":  "Action and fights",
         "hook":  "If you want monster fights without a long setup.",
         "description":  "Kafka is 32 and cleans up giant monster corpses for a living, which is the job you get when you fail the defense force exam enough times. Then he gets infected and turns into a monster himself. Now he has to pass the exam while hiding that he is the thing they are supposed to kill.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "25 episodes   3 seasons   2024",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Blood/Gore, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Kafka Hibino",
+                         "role":  "Cleans up monster corpses, then turns into one",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b180692-rPGXuxhcKw5N.png"
+                     },
+                     {
+                         "name":  "Kikoru Shinomiya",
+                         "role":  "An elite young officer, top of her class and knows it",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b183889-2Ar6AHPx2mre.png"
+                     },
+                     {
+                         "name":  "Reno Ichikawa",
+                         "role":  "Kafka\u0027s friend and fellow recruit",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b180694-Q0Ocr4aqBu4k.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GDKHZEJ0K",
@@ -197,7 +597,17 @@
         "category":  "Action and fights",
         "hook":  "If you like watching a character level up and want nothing more complicated than that.",
         "description":  "In a world where people fight monsters in dungeons for a living, Jinwoo is the weakest hunter alive and everyone knows it. Then he survives something he should not have and starts getting stronger in a way that works like a video game. Very flashy, very satisfying, not very complicated.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "26 episodes   2 seasons   2024",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Blood/Gore",
+        "cast":  [
+                     {
+                         "name":  "Sung Jinwoo",
+                         "role":  "The weakest hunter alive, until suddenly he is not",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b129928-BCEjVaP0AQSw.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GXJHM3P19",
@@ -207,7 +617,32 @@
         "category":  "Comedy",
         "hook":  "If you liked the visual weirdness in Mob Psycho.",
         "description":  "Bocchi is a guitarist who practiced alone in her closet for three years and is so anxious she sometimes melts into a puddle on screen, literally. Someone drags her into a band. The animation does whatever it wants whenever she panics, which is often.",
-        "meta":  "12 episodes."
+        "meta":  "12 episodes.",
+        "facts":  "14 episodes   2 seasons   2022",
+        "rating":  "TV-14",
+        "advisories":  "Profanity, Violence, Drug/Alcohol Use, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Hitori \"Bocchi\" Gotou",
+                         "role":  "Practised guitar alone in a closet for three years",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b257562-Ru35NYPfsqhY.png"
+                     },
+                     {
+                         "name":  "Nijika Ijichi",
+                         "role":  "The drummer who drags her into a band",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b261674-a8tJYvtzqWgC.png"
+                     },
+                     {
+                         "name":  "Ryou Yamada",
+                         "role":  "The bassist, aloof and permanently broke",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b264529-BvEusZnJLD2Y.png"
+                     },
+                     {
+                         "name":  "Ikuyo Kita",
+                         "role":  "The singer, bright and effortlessly popular",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b266041-1HKgjJGP2MmM.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GR24PVM76",
@@ -217,7 +652,42 @@
         "category":  "Comedy",
         "hook":  "If you like jokes that go on far longer than they should.",
         "description":  "Sketch comedy about ordinary school life, except a girl rides a goat to school and a professor builds a robot maid with a wind-up key in her back. The animation quality is wasted on the dumbest possible jokes, deliberately. Watch one episode and you will know immediately.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "26 episodes   2022",
+        "rating":  "TV-14",
+        "advisories":  "Sexual Content, Profanity, Violence, Smoking",
+        "cast":  [
+                     {
+                         "name":  "Hakase",
+                         "role":  "The child professor who built her",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b41055-RZH1b5am1LvO.png"
+                     },
+                     {
+                         "name":  "Yuuko Aioi",
+                         "role":  "A loud, unlucky high schooler who never reads the room",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b10418-nDUxYpR4dpmA.png"
+                     },
+                     {
+                         "name":  "Mai Minakami",
+                         "role":  "Quiet, deadpan, and relentlessly winding Yuuko up",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b10421-gPMhyPdWOxiu.png"
+                     },
+                     {
+                         "name":  "Sakamoto",
+                         "role":  "Their talking cat, who wears a scarf",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b41069-x6vyw7EIn1ET.png"
+                     },
+                     {
+                         "name":  "Mio Naganohara",
+                         "role":  "Short-tempered, and drawing things she hides",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b40081-dGRecovyuQMo.png"
+                     },
+                     {
+                         "name":  "Nano Shinonome",
+                         "role":  "A robot schoolgirl with a wind-up key in her back",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b10422-sNVCjkRg7lOd.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GRVNMG93Y",
@@ -227,7 +697,27 @@
         "category":  "Games and science",
         "hook":  "The smart version of the trapped-in-a-game premise.",
         "description":  "Thirty thousand players get stuck inside an MMO. Instead of panicking, a strategist named Shiroe decides the real problem is that nobody has built a working society yet, so he starts one. Guild politics, economics, contract law, and a lot of arguing in meeting rooms.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "62 episodes   3 seasons   2015",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Drug/Alcohol Use, Profanity",
+        "cast":  [
+                     {
+                         "name":  "Akatsuki",
+                         "role":  "An assassin who appoints herself his retainer",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/n81369-0vKZMoOH3NZT.jpg"
+                     },
+                     {
+                         "name":  "Shiroe",
+                         "role":  "A strategist who decides the real problem is society",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b81367-nE2CB4jLVPeu.png"
+                     },
+                     {
+                         "name":  "Naotsugu",
+                         "role":  "His old friend, a guardian who takes the hits",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/81371-03gxHpwaBbVL.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "GKEH2G428",
@@ -237,7 +727,22 @@
         "category":  "Games and science",
         "hook":  "The fun version of the trapped-in-a-game premise.",
         "description":  "Kaede does not want to feel pain in a VR game, so she dumps every stat point into defense and refuses to spend any on anything else. This should make her useless. Instead she accidentally becomes an unkillable monster that the developers cannot balance around.",
-        "meta":  "Full title: I Don\u0027t Want to Get Hurt, so I\u0027ll Max Out My Defense."
+        "meta":  "Full title: I Don\u0027t Want to Get Hurt, so I\u0027ll Max Out My Defense.",
+        "facts":  "48 episodes   4 seasons   2020",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity",
+        "cast":  [
+                     {
+                         "name":  "Kaede \"Maple\" Honjou",
+                         "role":  "Put every single point into defence",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b147892-sL0t1VEMhC6p.png"
+                     },
+                     {
+                         "name":  "Risa \"Sally\" Shiramine",
+                         "role":  "The friend who got her playing in the first place",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b147893-t481NA7vtmdF.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "G9VHN9185",
@@ -247,7 +752,22 @@
         "category":  "School and sports",
         "hook":  "If you want a show where nobody is cruel.",
         "description":  "A hyper-organized girl from a tiny village starts high school in Tokyo with a life plan mapped out to age 40, and immediately gets lost on the way to the opening ceremony. Gentle, funny, and unusually kind to every character in it.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "12 episodes   2023",
+        "rating":  "TV-14",
+        "advisories":  "Profanity",
+        "cast":  [
+                     {
+                         "name":  "Mitsumi Iwakura",
+                         "role":  "Arrived in Tokyo with a life plan and got lost immediately",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b138851-KqCx4CjktnPl.png"
+                     },
+                     {
+                         "name":  "Sousuke Shima",
+                         "role":  "Her easy-going classmate who everyone likes",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b138850-eqwZ11Q6sLrl.png"
+                     }
+                 ]
     },
     {
         "seriesId":  "GRE5XQJV6",
@@ -257,7 +777,22 @@
         "category":  "Quiet ones",
         "hook":  "If you want something calm with a bit of sadness in it.",
         "description":  "Natsume can see spirits, which has made his whole life lonely. He inherits a book of spirit names from his grandmother and starts returning them one at a time. Mostly a series of short, sad, warm stories.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "92 episodes   8 seasons   2022",
+        "rating":  "TV-14",
+        "advisories":  "Violence, Profanity, Supernatural Horror, Smoking, Drug/Alcohol Use",
+        "cast":  [
+                     {
+                         "name":  "Takashi Natsume",
+                         "role":  "Can see spirits, and is returning their names one by one",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b13783-FvmhRaCOKzKQ.png"
+                     },
+                     {
+                         "name":  "Madara (\"Nyanko-sensei\")",
+                         "role":  "A powerful spirit currently stuck as a fat cat",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/13784.jpg"
+                     }
+                 ]
     },
     {
         "seriesId":  "GRWEW95KR",
@@ -267,6 +802,36 @@
         "category":  "Quiet ones",
         "hook":  "If you want a show with almost no conflict in it at all.",
         "description":  "Girls go camping. That is the show. They set up tents, cook things over fires, and are cold. Mostly about gear, food, and being outside on purpose in winter.",
-        "meta":  ""
+        "meta":  "",
+        "facts":  "47 episodes   5 seasons   2018",
+        "rating":  "TV-14",
+        "advisories":  "Drug/Alcohol Use",
+        "cast":  [
+                     {
+                         "name":  "Nadeshiko Kagamihara",
+                         "role":  "New to camping and enormously enthusiastic about it",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b124576-daumBIJ4lOwq.png"
+                     },
+                     {
+                         "name":  "Aoi Inuyama",
+                         "role":  "Gentle, and tells tall stories with a straight face",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b124577-LA9JusqQcAJV.png"
+                     },
+                     {
+                         "name":  "Chiaki Oogaki",
+                         "role":  "Runs the outdoor club and picks the campsites",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b124578-3n5ImKmsxsvg.png"
+                     },
+                     {
+                         "name":  "Ena Saitou",
+                         "role":  "Rin\u0027s friend, who goes at her own pace",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b124579-xRtRfeogX1uO.jpg"
+                     },
+                     {
+                         "name":  "Rin Shima",
+                         "role":  "Camps alone on purpose, and prefers it that way",
+                         "image":  "https://s4.anilist.co/file/anilistcdn/character/large/b124586-9lGoHg1zZkFr.png"
+                     }
+                 ]
     }
 ]

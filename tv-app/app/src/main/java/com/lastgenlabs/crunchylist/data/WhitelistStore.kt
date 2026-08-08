@@ -100,6 +100,18 @@ class WhitelistStore private constructor(context: Context) {
                     put("hook", s.hook)
                     put("description", s.description)
                     put("meta", s.meta)
+                    put("facts", s.facts)
+                    put("rating", s.rating)
+                    put("advisories", s.advisories)
+                    put("cast", JSONArray().apply {
+                        s.cast.forEach { c ->
+                            put(JSONObject().apply {
+                                put("name", c.name)
+                                put("role", c.role)
+                                put("image", c.image ?: JSONObject.NULL)
+                            })
+                        }
+                    })
                 }
             )
         }
@@ -124,7 +136,21 @@ class WhitelistStore private constructor(context: Context) {
                 category = o.optString("category", ""),
                 hook = o.optString("hook", ""),
                 description = o.optString("description", ""),
-                meta = o.optString("meta", "")
+                meta = o.optString("meta", ""),
+                facts = o.optString("facts", ""),
+                rating = o.optString("rating", ""),
+                advisories = o.optString("advisories", ""),
+                cast = o.optJSONArray("cast")?.let { arr2 ->
+                    (0 until arr2.length()).mapNotNull { k ->
+                        val c = arr2.optJSONObject(k) ?: return@mapNotNull null
+                        val n = c.optString("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                        CastMember(
+                            name = n,
+                            role = c.optString("role", ""),
+                            image = c.optString("image").takeIf { it.isNotBlank() && it != "null" }
+                        )
+                    }
+                } ?: emptyList()
             )
         }
     }

@@ -5,8 +5,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +21,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -42,7 +50,11 @@ private val Dim = Color(0xFF8E8E9C)
  * which is roughly a paperback held at arm's length once scaled to a TV.
  */
 @Composable
-fun ShowDetailPanel(show: Show?, modifier: Modifier = Modifier) {
+fun ShowDetailPanel(
+    show: Show?,
+    modifier: Modifier = Modifier,
+    onMoreInfo: () -> Unit = {}
+) {
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -130,7 +142,39 @@ fun ShowDetailPanel(show: Show?, modifier: Modifier = Modifier) {
                 }
             }
         }
+
+        if (show?.hasMoreInfo == true) {
+            Spacer(Modifier.weight(1f))
+            // Reachable by pressing right from the grid's last column. Kept at the
+            // bottom so it doesn't shift as blurbs change length.
+            MoreInfoButton(onClick = onMoreInfo)
+        }
     }
+}
+
+@Composable
+private fun MoreInfoButton(onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val focused by interaction.collectIsFocusedAsState()
+
+    Text(
+        text = if (focused) "More info  ▸" else "More info",
+        color = if (focused) Color.Black else Body,
+        fontSize = 17.sp,
+        fontWeight = if (focused) FontWeight.Bold else FontWeight.Normal,
+        modifier = Modifier
+            .padding(top = 14.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (focused) Orange else Color(0xFF262631))
+            .border(
+                width = if (focused) 3.dp else 0.dp,
+                color = if (focused) Color.White else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .clickable(interactionSource = interaction, indication = null) { onClick() }
+            .focusable(interactionSource = interaction)
+            .padding(horizontal = 22.dp, vertical = 12.dp)
+    )
 }
 
 private fun tween(ms: Int) = androidx.compose.animation.core.tween<Float>(durationMillis = ms)
