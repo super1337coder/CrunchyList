@@ -49,6 +49,20 @@ object Crunchyroll {
     }
 
     /**
+     * Launches Crunchyroll the way the TV app menu does.
+     *
+     * Must be the *leanback* lookup. `getLaunchIntentForPackage()` searches for
+     * `CATEGORY_LAUNCHER`, and Crunchyroll's TV build only declares
+     * `CATEGORY_LEANBACK_LAUNCHER` on its SplashActivity — so the ordinary call
+     * returns null and looks indistinguishable from "not installed".
+     */
+    fun launchIntent(context: Context): Intent? {
+        val pm = context.packageManager
+        return pm.getLeanbackLaunchIntentForPackage(PACKAGE)
+            ?: pm.getLaunchIntentForPackage(PACKAGE)
+    }
+
+    /**
      * Crunchyroll's version code. The guard stores this and re-calibrates when it
      * changes, so a CR update can't silently invalidate the approved-screen list
      * (audit §4.2.4). Requires the <queries> entry in the manifest.

@@ -47,24 +47,37 @@ class GuardCalibrator(private val context: Context) {
         val show = runCatching { phaseShow(referenceSeriesId) }.getOrNull()
             ?: return finish(false, "Crunchyroll never reached a show page.")
 
-        if (show == home) {
+        // THE safety rule. Learning is only safe if the candidate screen is
+        // reachable *exclusively* via the deep link — so it must not be any screen
+        // seen while Crunchyroll was opened normally, not merely different from the
+        // last one.
+        //
+        // An earlier version compared only the final class of each phase and
+        // "successfully" learned MainActivity — Crunchyroll's entire catalogue — as
+        // approved, because both phases had captured different transit screens
+        // before the app finished loading. That silently disables the whole filter,
+        // which is far worse than failing to calibrate.
+        if (show.settled in home.seen) {
             return finish(
                 false,
-                "The deep link no longer opens a show page — Crunchyroll may have changed it. " +
-                    "Shows can't be opened until this is fixed."
+                "Couldn't tell the show page apart from Crunchyroll's own screens. " +
+                    "Nothing was changed — the guard is still using its existing rules."
             )
         }
 
-        policy.rememberApproved(show)
+        policy.rememberApproved(show.settled)
         Crunchyroll.versionCode(context)?.let { policy.calibratedForVersion = it }
 
-        Log.i(TAG, "calibrated: approved=$show home=$home")
-        return finish(true, "Verified. Approved screen: ${show.substringAfterLast('.')}")
+        Log.i(TAG, "calibrated: approved=${show.settled}; home phase saw ${home.seen}")
+        return finish(true, "Verified. Approved screen: ${show.settled.substringAfterLast('.')}")
     }
 
+    /** What a phase observed: where it ended up, and everything it passed through. */
+    private data class Observation(val settled: String, val seen: Set<String>)
+
     /** Launch Crunchyroll the way the app menu would, and see where it lands. */
-    private suspend fun phaseHome(): String? {
-        val launch = context.packageManager.getLaunchIntentForPackage(Crunchyroll.PACKAGE)
+    private suspend fun phaseHome(): Observation? {
+        val launch = Crunchyroll.launchIntent(context)
         if (launch == null) {
             Log.w(TAG, "phaseHome: no launch intent for ${Crunchyroll.PACKAGE}")
             return null
@@ -73,29 +86,33 @@ class GuardCalibrator(private val context: Context) {
         Log.i(TAG, "phaseHome: launching Crunchyroll")
         runCatching { context.startActivity(launch) }
             .onFailure { Log.w(TAG, "phaseHome: startActivity failed", it); return null }
-        val settled = awaitSettled()
-        Log.i(TAG, "phaseHome: settled on ${settled ?: "<nothing>"}")
-        return settled
+        val obs = awaitSettled()
+        Log.i(TAG, "phaseHome: settled=${obs?.settled ?: "<nothing>"} seen=${obs?.seen}")
+        return obs
     }
 
     /** Fire a known-good series deep link and see where it lands. */
-    private suspend fun phaseShow(seriesId: String): String? {
+    private suspend fun phaseShow(seriesId: String): Observation? {
         Log.i(TAG, "phaseShow: deep-linking to $seriesId")
         runCatching { context.startActivity(Crunchyroll.seriesIntent(seriesId)) }
             .onFailure { Log.w(TAG, "phaseShow: startActivity failed", it); return null }
-        val settled = awaitSettled()
-        Log.i(TAG, "phaseShow: settled on ${settled ?: "<nothing>"}")
-        return settled
+        val obs = awaitSettled()
+        Log.i(TAG, "phaseShow: settled=${obs?.settled ?: "<nothing>"} seen=${obs?.seen}")
+        return obs
     }
 
     /**
-     * Waits for Crunchyroll's foreground activity to stop changing.
+     * Waits for Crunchyroll's foreground activity to stop changing, and reports
+     * every class seen along the way.
      *
-     * "Settled" means the same class is reported [STABLE_POLLS] times running —
-     * a launch transits several activities before arriving, and taking the first
-     * sighting would learn the splash screen.
+     * Patience is the whole game here. Crunchyroll transits splash -> startup ->
+     * main -> detail, and each hop can sit still for a second or two on a cold
+     * start. An earlier 2s threshold declared the *splash screen* settled, which
+     * poisoned calibration. The confirmation pass afterwards exists because a
+     * screen can look stable and then still be replaced.
      */
-    private suspend fun awaitSettled(): String? {
+    private suspend fun awaitSettled(): Observation? {
+        val seen = linkedSetOf<String>()
         var candidate: String? = null
         var stable = 0
 
@@ -103,24 +120,39 @@ class GuardCalibrator(private val context: Context) {
             delay(POLL_MS)
             val fg = watcher.current()
             if (fg?.packageName != Crunchyroll.PACKAGE) {
-                // Left Crunchyroll entirely — restart the count rather than
-                // learning whatever happened to be showing.
                 candidate = null
                 stable = 0
                 return@repeat
             }
             val cls = fg.className ?: return@repeat
+            seen += cls
 
             if (cls == candidate) {
                 stable++
-                if (stable >= STABLE_POLLS) return cls
+                if (stable >= STABLE_POLLS) {
+                    // Confirmation pass: keep watching a while longer and make sure
+                    // nothing supersedes it.
+                    repeat(CONFIRM_POLLS) {
+                        delay(POLL_MS)
+                        val again = watcher.current()
+                        if (again?.packageName == Crunchyroll.PACKAGE) {
+                            again.className?.let { seen += it }
+                            if (again.className != null && again.className != cls) {
+                                candidate = again.className
+                                stable = 1
+                                return@repeat
+                            }
+                        }
+                    }
+                    if (candidate == cls) return Observation(cls, seen)
+                }
             } else {
                 candidate = cls
                 stable = 1
             }
         }
-        // Ran out of time; accept a candidate seen more than once, else give up.
-        return if (stable >= 2) candidate else null
+        Log.w(TAG, "awaitSettled: never stabilised; seen=$seen")
+        return null
     }
 
     private fun finish(ok: Boolean, message: String): Result {
@@ -147,8 +179,9 @@ class GuardCalibrator(private val context: Context) {
     private companion object {
         const val TAG = "CLGuard"
         const val POLL_MS = 500L
-        const val MAX_POLLS = 40          // ~20s per phase
-        const val STABLE_POLLS = 4        // ~2s unchanged
-        const val TOTAL_GRACE_MS = 60_000L
+        const val MAX_POLLS = 90          // ~45s per phase — cold starts are slow
+        const val STABLE_POLLS = 10       // ~5s unchanged before believing it
+        const val CONFIRM_POLLS = 6       // ~3s more to catch a late replacement
+        const val TOTAL_GRACE_MS = 150_000L
     }
 }

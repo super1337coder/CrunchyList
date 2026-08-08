@@ -48,6 +48,7 @@ import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardCalibrator
 import com.lastgenlabs.crunchylist.guard.GuardPermissions
+import com.lastgenlabs.crunchylist.guard.ScreenPolicy
 import com.lastgenlabs.crunchylist.guard.GuardService
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -232,7 +233,8 @@ private fun SettingsScreen(
                             imageUrl = info?.imageUrl,
                             dateAdded = LocalDate.now().toString()
                         )
-                        status = if (store.add(show)) {
+                        val added = store.add(show)
+                        status = if (added) {
                             input = ""
                             if (info == null) {
                                 "Added $id, but couldn't reach Crunchyroll for its title and art."
@@ -241,6 +243,16 @@ private fun SettingsScreen(
                             }
                         } else {
                             "${show.title} is already on the list."
+                        }
+
+                        // Calibrate as soon as there is something to calibrate with,
+                        // while the parent is still here to see the result. Doing it
+                        // later — on app launch — would yank a kid into Crunchyroll
+                        // with no explanation.
+                        if (added && ScreenPolicy(context).needsCalibration(context)) {
+                            status = "${status}\nVerifying Crunchyroll…"
+                            val result = GuardCalibrator(context).calibrate(show.seriesId)
+                            status = "${show.title} added.\n${result.message}"
                         }
                         busy = false
                     }
