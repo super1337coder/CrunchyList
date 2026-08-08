@@ -4,6 +4,8 @@ A parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.c
 
 A [Last Gen Labs](https://lastgenlabs.com) project.
 
+![CrunchyList on Google TV — a grid of parent-approved shows](screenshots/tv-app-home.png)
+
 ## Two front ends
 
 | | |
@@ -91,6 +93,8 @@ It asserts only on observable behaviour and never trusts the app's own status te
 > It runs. It does not reliably do what the rest of this section describes. **Use `tv-app/`.**
 
 The sections below document the extension as designed. Read them as intent, not as behaviour.
+
+![The Chrome extension's new-tab landing page](screenshots/MainMenu.png)
 
 ## How It Works
 
