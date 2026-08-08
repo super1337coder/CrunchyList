@@ -23,7 +23,13 @@ Crunchyroll's built-in parental controls are one blunt axis — "restrict mature
 
 ## The Google TV app
 
-**What the kids see:** a grid of approved shows with real poster art. Pick one, and Crunchyroll opens straight to that series — with its own resume state intact, so "Continue: E7" still works.
+**What the kids see:** a grid of approved shows with real poster art. Highlighting one shows a write-up of it beside the grid; selecting it offers **Play** and **More info**. Play opens Crunchyroll straight to that series — with its own resume state intact, so "Continue: E7" still works.
+
+**More info** is a full page on the show: what it is actually about, and a portrait and a paragraph for each main character — who they are, what they can do, what they are like. It exists because deciding what to watch off a wall of poster art is hard, and because knowing a show before starting it is the difference between "no thanks" and "yes" for some kids.
+
+![The More Info screen, showing character portraits and write-ups](screenshots/tv-app-more-info.png)
+
+Every word of that is hand-written. Scraped synopses were tried first and were unusable — wiki markup leaked through, the voice changed every entry, and several gave away endings.
 
 **What stops them wandering:** a background guard. Crunchyroll's app can otherwise be opened straight from the TV's app menu, and one Back press from a show lands in the full catalogue. The guard watches which activity is foreground and bounces back to CrunchyList whenever Crunchyroll shows anything that isn't an approved screen.
 
@@ -37,7 +43,9 @@ Grab the APK from [Releases](https://github.com/super1337coder/CrunchyList/relea
 
 **Without those two permissions the app filters nothing.** It says so in red on the home screen rather than pretending otherwise.
 
-Set a parent PIN, and you're done: **the app ships with a curated starter list of 27 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) that seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
+Set a parent PIN, and you're done: **the app ships with a curated starter list of 29 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) that seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
+
+Which shows are on the list is yours — remove one and it stays gone through every update. The write-ups attached to them come from the app, so improving that copy reaches an installed TV.
 
 #### Why it isn't on the Play Store
 
@@ -211,13 +219,15 @@ CrunchyList/
 │           │   └── GuardCalibrator.kt     re-learns CR's screens by observation
 │           ├── crunchyroll/    #   deep links + CMS API
 │           ├── data/           #   whitelist storage
+│           │   └── SeedMerge.kt            membership is yours, text is the app's (pure, tested)
 │           ├── settings/       #   PIN-gated parent screen
-│           └── ui/             #   tile grid
+│           └── ui/             #   tile grid, detail panel, More Info
 │
 ├── extension/                  # LEGACY Chrome extension — see warning above
 │
 ├── tools/
 │   ├── verify-guard.sh         # behavioural checks against a real device
+│   ├── fetch-show.ps1          # art, facts and cast portraits for a new show
 │   ├── probe-deeplinks.ps1     # re-derive the crunchyroll:// grammar
 │   └── probe-usagestats/       # guard feasibility probe (Gradle-free)
 │

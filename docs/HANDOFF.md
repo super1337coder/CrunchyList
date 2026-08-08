@@ -12,9 +12,9 @@ this file is just current state and what's next.
 |---|---|
 | Guard (the thing that makes this a parental control) | ✅ 10 behavioural checks pass |
 | Tile grid, detail panel, More Info screen | ✅ |
-| 27 shows seeded with art, write-ups, cast and portraits | ✅ |
-| Unit tests | ✅ 40 pass |
-| Signed release APK | ✅ `dist/`, tag `v0.1.0` pushed |
+| 29 shows seeded with art, long write-ups, cast, portraits and bios | ✅ |
+| Unit tests | ✅ 51 pass |
+| Signed release APK | ✅ `dist/`, tag `v0.1.1` pushed |
 | GitHub release published | ❌ **needs your GitHub login** |
 | Tested on the physical Streamer | ❌ never |
 
@@ -23,39 +23,34 @@ JVM starts, working around AF_UNIX being blocked under `AppData\Local\Temp` on t
 
 ```bash
 bash tv-app/build.sh assembleDebug     # build
-bash tv-app/build.sh testDebugUnitTest # 40 unit tests
+bash tv-app/build.sh testDebugUnitTest # 51 unit tests
 bash tools/verify-guard.sh             # 10 behavioural checks, needs a device
-bash tools/release.sh v0.1.0           # signed APK + tag + publish
+bash tools/release.sh v0.1.1           # signed APK + tag + publish
 ```
 
 ## Next, roughly in order
 
-1. **Publish the v0.1.0 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
-   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.0` — notes
-   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.0.apk`. Or
-   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.0`.
+1. **Publish the v0.1.1 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
+   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.1` — notes
+   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.1.apk`. Or
+   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.1`.
    **Rebuild the APK first if commits have landed since.**
 
-2. **Add Mob Psycho 100 (`GY190DKQR`) and Dr. STONE (`GYEXQKJG6`).** Approved. Mob Psycho was
-   missing from the source list only because they're watching it right now.
+2. **Test on the Streamer.** The specific unknown is whether the guard survives a real boot.
+   Everything to date is emulator-only.
 
-3. **Expand every write-up.** The current text is too condensed. Chris's example: Frieren's
-   *"An elf mage who outlived the friends she quested with"* should go further into who she is
-   and what she can do — same for the show descriptions. The kids are 10 and 13 and read well
-   on a big screen, so length is not the constraint. Probably wants a longer field
-   (`Show.about`, `CastMember.bio`) plus UI in `MoreInfoDialog`.
-
-4. **Test on the Streamer.** The specific unknown is whether the guard survives a real boot.
+3. **Shows on hold** — see below. Demon Slayer is the nearest.
 
 ## Shows: decided, held, and unavailable
 
-**Approved, not yet added:** Mob Psycho 100 `GY190DKQR`, Dr. STONE `GYEXQKJG6`.
+**On the list:** 29 entries, [WATCHLIST.md](WATCHLIST.md). Mob Psycho 100 `GY190DKQR` and
+Dr. STONE `GYEXQKJG6` were added in 0.1.1.
 
 **On hold — do not add without an explicit go-ahead:**
 
 | Show | ID | Why held |
 |---|---|---|
-| Demon Slayer | `GY5P48XEY` | "will add soon" — nearly ready |
+| Demon Slayer | `GY5P48XEY` | "will add soon" — nearly ready. CR labels: *Violence, Suicide* |
 | My Hero Academia | `G6NQ5DWZ6` | carries a *Sexualized Imagery* label |
 | Dandadan | `GG5H5XQ0D` | episode one — which is why CR labels it *Sexual Violence* |
 
@@ -65,8 +60,24 @@ bash tools/release.sh v0.1.0           # signed APK + tag + publish
 Witch Academia, One Punch Man, Silver Spoon. The last two were listed under Crunchyroll in the
 source doc, so their licensing has moved.
 
-**Researched and clean, not yet proposed:** Wind Breaker `G3KHEVDPE` (*Violence* only),
-Blue Lock `G4PH0WEKE` (*Profanity* only), World Trigger `GR757DMKY`.
+**Researched and clean, not yet proposed:** Wind Breaker `G3KHEVDPE` (*Violence* only — Furin
+High delinquents who protect their town, fists only, no weapons or gore, essentially no romance
+or fanservice), Blue Lock `G4PH0WEKE` (*Profanity* only), World Trigger `GR757DMKY`.
+
+## Adding a show
+
+```bash
+powershell -File tools/fetch-show.ps1 GY5P48XEY "Kimetsu no Yaiba"
+```
+
+Prints poster art, episode counts, rating, Crunchyroll's content labels and main-cast
+portraits. **Check the AniList title it prints** — three of the original 27 matched the wrong
+entry. Then hand-write `hook`, `description`, `about`, and a `role` and `bio` per character
+into `tv-app/app/src/main/assets/default_whitelist.json`. The prose is deliberately not
+generated; see the note at the top of that script.
+
+`about` is blank-line-separated paragraphs. Keep `description` short — the side panel is sized
+to fit rather than scroll, so length there gets cut off. Length belongs in `about`.
 
 ## Traps that will bite again
 
@@ -82,20 +93,29 @@ the things most likely to waste an hour.
 - **`getLaunchIntentForPackage()` returns null for TV apps.** They declare
   `CATEGORY_LEANBACK_LAUNCHER`, not `CATEGORY_LAUNCHER`. Looks exactly like "not installed".
 - **Crunchyroll's API wants an honest User-Agent.** A browser UA gets 403 from Android —
-  Cloudflare rejects the mismatch. The opposite of what the extension needed.
+  Cloudflare rejects the mismatch. The opposite of what the extension and the desktop tools
+  need.
 - **AniList title matching is unreliable.** Three of 27 matched the wrong entry, one of them a
   completely different show. Always print the matched title and check it. `sort:SEARCH_MATCH`
   is required or Frieren returns a spin-off special.
-- **PowerShell 5.1 reads files as ANSI unless told otherwise.** `Get-Content -Raw -Encoding UTF8`,
-  and no non-ASCII literals in `.ps1` files — both produced mojibake in show titles.
-- **Git Bash rewrites paths starting with `/`.** `MSYS_NO_PATHCONV=1` for adb device paths, but
-  it must not be set globally or local file paths break too.
+- **PowerShell 5.1 reads a BOM-less `.ps1` as ANSI.** One em-dash in a string literal is a
+  *parse error*, not a wrong character. Keep `.ps1` files pure ASCII — this bit again writing
+  `fetch-show.ps1`. `<--` in a string is also a parse error; `<` is a reserved operator.
+- **`Get-Content -Raw` needs `-Encoding UTF8`** or show titles come back as mojibake.
+- **Git Bash rewrites paths starting with `/`.** `MSYS_NO_PATHCONV=1` for adb device paths
+  (including `adb shell screencap -p /sdcard/x.png`, not just `adb pull`), but it must not be
+  set globally or local file paths break too.
+- **Seeding is not the same as displaying.** The bundled list is read on first run only for
+  *membership*; text is refreshed every launch by `SeedMerge`. Before that split, shipping a
+  better write-up did nothing on an installed device and every step still reported success.
 
 ## Standing principle
 
 Every serious bug in this project failed the same way: **the app looked healthy and protected
 nothing.** A guard that never armed, a whitelist that never reached the grid, a calibration
-that approved the entire catalogue and reported success.
+that approved the entire catalogue and reported success, new copy that shipped and was never
+displayed.
 
-So `ScreenClassifier` fails closed, and `tools/verify-guard.sh` asserts only on observable
-behaviour and never reads the app's own status text. Keep both properties.
+So `ScreenClassifier` fails closed, `SeedMerge` is pure and separately tested, and
+`tools/verify-guard.sh` asserts only on observable behaviour and never reads the app's own
+status text. Keep those properties.

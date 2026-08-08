@@ -7,11 +7,16 @@ package com.lastgenlabs.crunchylist.data
  * likes knowing a show before starting it actually wants. Written by hand rather
  * than scraped: the source data was inconsistent in voice, leaked wiki markup,
  * and occasionally gave away plot.
+ *
+ * [bio] is the same thing at length: what they can actually do, how they behave,
+ * why they are worth watching. A one-liner turned out to be too thin — knowing a
+ * character before starting is most of the reason this screen exists.
  */
 data class CastMember(
     val name: String,
     val role: String = "",
-    val image: String? = null
+    val image: String? = null,
+    val bio: String = ""
 )
 
 /**
@@ -36,8 +41,23 @@ data class Show(
     /** The one-line reason to pick this, e.g. "If you want a show where nobody is cruel." */
     val hook: String = "",
 
-    /** The full write-up. */
+    /**
+     * The short write-up, for the side panel.
+     *
+     * Kept short on purpose: the panel is sized to fit rather than scroll, because
+     * focus stays in the grid and an unreachable scrollbar would just hide the tail
+     * of it. Length belongs in [about].
+     */
     val description: String = "",
+
+    /**
+     * The long write-up, for the More Info screen only.
+     *
+     * Paragraphs separated by a blank line. This is where the show actually gets
+     * described — what the world is, what the characters are trying to do, what
+     * watching it is like — for a kid deciding whether to start it.
+     */
+    val about: String = "",
 
     /** Episode counts, seasons, which version this is — whatever is worth knowing. */
     val meta: String = "",
@@ -63,5 +83,9 @@ data class Show(
 
     /** True when the More Info screen would have anything beyond the panel. */
     val hasMoreInfo: Boolean
-        get() = cast.isNotEmpty() || facts.isNotBlank() || advisories.isNotBlank()
+        get() = about.isNotBlank() || cast.isNotEmpty() || facts.isNotBlank() || advisories.isNotBlank()
+
+    /** [about] if there is one, falling back to the panel's shorter text. */
+    val longRead: String
+        get() = about.ifBlank { description }
 }

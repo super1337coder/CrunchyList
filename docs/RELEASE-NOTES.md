@@ -7,12 +7,27 @@ dial with an explicit list.
 
 ### What it does
 
-- **A curated grid.** Kids see only approved shows, with real poster art. Pick one and
-  Crunchyroll opens straight to it, resume state intact.
+- **A curated grid.** Kids see only approved shows, with real poster art. Highlight one for a
+  write-up of it; select it for **Play** and **More info**. Play opens Crunchyroll straight to
+  the series, resume state intact.
+- **A page on every show.** More info gives the full write-up plus a portrait and a paragraph
+  on each main character — who they are and what they can do. Hand-written, not scraped.
 - **A guard that holds the line.** Crunchyroll can otherwise be opened straight from the TV's
   app menu, one Back press from a show lands in the full catalogue, and Google TV's own
   "Continue watching" row resumes anything. All three are bounced back.
-- **Ships with 27 shows** already loaded, so there is nothing to type on a remote.
+- **Ships with 29 shows** already loaded, so there is nothing to type on a remote.
+
+### Changes in 0.1.1
+
+- **Every show and character write-up expanded**, from a couple of lines to several paragraphs
+  and a real bio per character. About 11,000 words of it.
+- **Added Mob Psycho 100 and Dr. STONE.**
+- **Selecting a tile opens the panel** rather than launching straight into Crunchyroll, so
+  **More info** is somewhere you land rather than something you find by accident.
+- **Updating the app now refreshes the bundled write-ups.** Which shows are on the list stays
+  yours — remove one and it stays gone — but the text attached to them comes from the APK, so
+  improving it reaches an installed TV. Previously new copy shipped and was never displayed.
+- `tools/fetch-show.ps1` pulls art, facts and cast portraits for a new show.
 
 It needs no AccessibilityService — it reads the foreground activity through `UsageStatsManager`.
 

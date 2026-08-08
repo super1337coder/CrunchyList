@@ -14,7 +14,7 @@ Series IDs and titles come from Crunchyroll's CMS API, not from search results. 
 search is noisy — it returned *Akebi's Sailor Uniform* for the query "sailor moon" — so every
 match here was verified against the title rather than taken from the first hit.
 
-## On Crunchyroll — 27 entries, 26 titles
+## On Crunchyroll — 29 entries, 28 titles
 
 | Title | Series ID | Listed under |
 |---|---|---|
@@ -45,9 +45,15 @@ match here was verified against the title rather than taken from the first hit.
 | Skip and Loafer | `G9VHN9185` | Crunchyroll |
 | Natsume's Book of Friends | `GRE5XQJV6` | Crunchyroll |
 | Laid-Back Camp | `GRWEW95KR` | Crunchyroll |
+| Mob Psycho 100 | `GY190DKQR` | added later |
+| Dr. STONE | `GYEXQKJG6` | added later |
 
 **Trigun** is two entries because the source list explicitly offers both: the 1998 original and
 the newer *Trigun Stampede*. Remove whichever isn't wanted.
+
+**Mob Psycho 100** and **Dr. STONE** are not from the source document — both were added on
+request afterwards. Mob Psycho was missing from the list only because they were already
+watching it.
 
 ## Not on Crunchyroll — 4 titles
 
@@ -66,10 +72,23 @@ from the app rather than broken — CrunchyList only ever contains what a parent
 
 ## Changing the list
 
-The bundled file is a **starting point, not the source of truth**. Once the app has seeded, the
-list lives on the device and is edited from Settings; editing the asset afterwards has no
-effect on an installed app.
+The bundled file is a **starting point for membership, and the source of truth for text**. The
+split, implemented in `SeedMerge`:
 
-Seeding is guarded by a "have we ever seeded" flag rather than "is the list empty", so removing
-every show does not bring them all back on the next launch — the mistake the Chrome extension
-made (audit §3.9).
+- **Which shows are allowed is the parent's.** A bundled show is added only if this install has
+  never seeded it before, so removing one keeps it gone however many updates land. That is the
+  mistake the Chrome extension made — it re-seeded whenever the list hit zero (audit §3.9).
+- **The write-ups, cast and labels are the bundle's.** Every show still on the list has its text
+  refreshed from the APK on each launch, so shipping better copy actually reaches an installed
+  app. Before this, improving a write-up did nothing: the new text sat in the APK while the
+  device rendered what it had cached on first run.
+
+Each entry carries a short `description` for the side panel and a longer `about` for the More
+Info screen, plus a `role` line and a `bio` paragraph for each cast member. All of that prose is
+hand-written. Scraped synopses were tried first and were unusable — wiki markup leaked through,
+the voice changed every entry, and several gave away endings.
+
+To add a show, `powershell -File tools/fetch-show.ps1 <SERIES_ID> "<AniList search>"` pulls the
+poster art, episode counts, maturity rating, content labels and main-cast portraits. **Check the
+AniList title it prints.** Three of the original 27 matched the wrong entry, one of them a
+completely different show.

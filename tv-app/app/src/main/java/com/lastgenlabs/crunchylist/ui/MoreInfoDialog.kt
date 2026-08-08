@@ -58,9 +58,13 @@ private val Dim = Color(0xFF8E8E9C)
 /**
  * The "tell me about this show before I start it" screen.
  *
- * Built for a kid who likes knowing who everyone is first: portraits and a
- * one-line "what they do" for each main character, plus the factual bits
- * (episodes, year) and Crunchyroll's content labels.
+ * Built for a kid who likes knowing who everyone is first: a proper write-up of
+ * the show, then a portrait and a paragraph on each main character — who they
+ * are, what they can do, what they are like — plus the factual bits and
+ * Crunchyroll's content labels.
+ *
+ * This is the one screen with room to be long. The side panel has to fit on
+ * screen, so it stays short; everything that wants space lands here.
  *
  * Scrollable, unlike the side panel — this one takes focus, so the D-pad can
  * actually move through it.
@@ -70,6 +74,13 @@ fun MoreInfoDialog(show: Show, onDismiss: () -> Unit) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val focus = remember { FocusRequester() }
+
+    // Blank-line-separated in the data, one Text per paragraph here. A single
+    // Text with embedded newlines would render, but paragraph spacing you can
+    // actually see is most of what makes a wall of text readable across a room.
+    val paragraphs = remember(show.seriesId, show.about, show.description) {
+        show.longRead.split(Regex("\n\\s*\n")).map { it.trim() }.filter { it.isNotEmpty() }
+    }
 
     // Nothing in here is clickable, so there is nothing for D-pad focus traversal
     // to move to — and without focus the list will not scroll at all, leaving the
@@ -86,7 +97,7 @@ fun MoreInfoDialog(show: Show, onDismiss: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Scrim)
-                .padding(horizontal = 72.dp, vertical = 44.dp),
+                .padding(horizontal = 56.dp, vertical = 32.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -99,7 +110,10 @@ fun MoreInfoDialog(show: Show, onDismiss: () -> Unit) {
                     .focusable()
                     .onKeyEvent { event ->
                         if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
-                        val step = 240f
+                        // Roughly a third of a screen per press. Holding the
+                        // D-pad repeats the key, so a long write-up is a hold
+                        // rather than thirty presses.
+                        val step = 340f
                         when (event.key) {
                             Key.DirectionDown -> {
                                 scope.launch { listState.animateScrollBy(step) }; true
@@ -113,64 +127,58 @@ fun MoreInfoDialog(show: Show, onDismiss: () -> Unit) {
             ) {
                 LazyColumn(
                     state = listState,
-                    verticalArrangement = Arrangement.spacedBy(18.dp)
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                    modifier = Modifier.weight(1f)
                 ) {
 
-                    item { Header(show) }
+                    // The opening paragraph sits beside the poster rather than
+                    // under it. A portrait poster is taller than a title and a
+                    // couple of fact lines, so keeping the text out of that
+                    // column left a band of empty card across the top of the
+                    // screen with the most-read paragraph pushed below it.
+                    item { Header(show, lead = paragraphs.firstOrNull()) }
 
-                    if (show.description.isNotBlank()) {
-                        item {
-                            Text(
-                                show.description,
-                                color = Body,
-                                fontSize = 17.sp,
-                                lineHeight = 25.sp
-                            )
-                        }
+                    items(paragraphs.drop(1)) { para ->
+                        Text(para, color = Body, fontSize = 17.sp, lineHeight = 26.sp)
                     }
 
                     if (show.cast.isNotEmpty()) {
-                        item {
-                            Text(
-                                "WHO'S IN IT",
-                                color = Orange,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.5.sp,
-                                modifier = Modifier.padding(top = 6.dp)
-                            )
-                        }
-                        items(show.cast) { member -> CastRow(member) }
+                        item { SectionLabel("WHO'S IN IT") }
+                        items(show.cast, key = { it.name }) { member -> CastRow(member) }
                     }
 
                     if (show.advisories.isNotBlank()) {
                         item { Advisories(show) }
                     }
-
-                    item {
-                        Text(
-                            "Up / down to scroll   ·   Back to close",
-                            color = Dim,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 10.dp)
-                        )
-                    }
                 }
+
+                // Pinned rather than the last item in the list. These write-ups
+                // run to several screens, and a scroll hint you can only see
+                // once you have finished scrolling is no hint at all.
+                Text(
+                    "Up / down to scroll   ·   Back to close",
+                    color = Dim,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun Header(show: Show) {
+private fun Header(show: Show, lead: String?) {
     Row(verticalAlignment = Alignment.Top) {
         if (!show.imageUrl.isNullOrBlank()) {
             SubcomposeAsyncImage(
                 model = show.imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                // Small enough that the facts beside it roughly fill its height —
+                // a taller poster leaves a band of empty card above the write-up,
+                // which is wasted space on a screen that now has a lot to read.
                 modifier = Modifier
-                    .width(150.dp)
+                    .width(132.dp)
                     .aspectRatio(2f / 3f)
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color(0xFF2E2E38))
@@ -213,16 +221,40 @@ private fun Header(show: Show) {
             if (show.meta.isNotBlank()) {
                 Text(show.meta, color = Dim, fontSize = 15.sp, lineHeight = 21.sp)
             }
+            if (!lead.isNullOrBlank()) {
+                Text(
+                    lead,
+                    color = Body,
+                    fontSize = 17.sp,
+                    lineHeight = 26.sp,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
+private fun SectionLabel(text: String) {
+    Text(
+        text,
+        color = Orange,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.5.sp,
+        modifier = Modifier.padding(top = 10.dp)
+    )
+}
+
+@Composable
 private fun CastRow(member: CastMember) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    // Top-aligned rather than centred: with a paragraph of bio the text column is
+    // several times the height of the portrait, and centring leaves the face
+    // floating in the middle of the block.
+    Row(verticalAlignment = Alignment.Top) {
         Box(
             modifier = Modifier
-                .size(72.dp)
+                .size(84.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF2E2E38))
                 .border(2.dp, Color(0xFF3A3A46), CircleShape),
@@ -260,11 +292,19 @@ private fun CastRow(member: CastMember) {
                 )
             }
         }
-        Spacer(Modifier.width(20.dp))
-        Column {
-            Text(member.name, color = Color.White, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.width(22.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(member.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             if (member.role.isNotBlank()) {
-                Text(member.role, color = Body, fontSize = 16.sp, lineHeight = 22.sp)
+                Text(
+                    member.role,
+                    color = Color(0xFFFFC79A),
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp
+                )
+            }
+            if (member.bio.isNotBlank()) {
+                Text(member.bio, color = Body, fontSize = 16.sp, lineHeight = 24.sp)
             }
         }
     }

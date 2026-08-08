@@ -23,39 +23,53 @@ class WhitelistStore private constructor(context: Context) {
     val shows: StateFlow<List<Show>> = _shows.asStateFlow()
 
     init {
-        seedFromAssetsIfFirstRun(context)
+        syncWithBundle(context)
     }
 
     /**
-     * Loads the bundled starter list the first time the app runs.
+     * Reconciles the list on disk with the one bundled in this APK.
      *
      * Entering ~30 series IDs with a TV remote is miserable, so the curated list
-     * ships with the app.
+     * ships with the app — but it is a starting point, not an authority. See
+     * [SeedMerge] for the split between what the parent owns (which shows) and
+     * what the APK owns (the write-ups).
      *
-     * Guarded by a "have we ever seeded" flag rather than "is the list empty".
-     * Those differ in a way that matters: the Chrome extension re-seeded whenever
-     * its list hit zero, so a parent who deliberately removed every show found
-     * them all back on the next launch (audit §3.9). Removing everything is a
-     * legitimate thing to want.
+     * Membership is tracked by "have we ever offered this ID" rather than "is the
+     * list empty". Those differ in a way that matters: the Chrome extension
+     * re-seeded whenever its list hit zero, so a parent who deliberately removed
+     * every show found them all back on the next launch (audit §3.9).
      */
-    private fun seedFromAssetsIfFirstRun(context: Context) {
-        if (prefs.getBoolean(KEY_SEEDED, false)) return
-        prefs.edit().putBoolean(KEY_SEEDED, true).apply()
-
-        if (_shows.value.isNotEmpty()) return   // already curated; don't touch it
-
+    private fun syncWithBundle(context: Context) {
         val raw = try {
             context.applicationContext.assets.open(SEED_ASSET)
                 .bufferedReader().use { it.readText() }
         } catch (_: Exception) {
             return   // no bundled list is a perfectly fine state
         }
-        val seeded = try {
+        val bundled = try {
             decode(raw)
         } catch (_: Exception) {
             emptyList()
         }
-        if (seeded.isNotEmpty()) persist(seeded)
+        if (bundled.isEmpty()) return
+
+        val everSeeded: Set<String> = when {
+            // First ever launch — nothing has been offered, so all of it is new.
+            !prefs.getBoolean(KEY_SEEDED, false) -> emptySet()
+            // Upgraded from a build that recorded only *that* it seeded, not what.
+            // The current list is the only evidence there is, so treat it as the
+            // record: a show removed under the old build returns once, and never
+            // again after that.
+            else -> prefs.getStringSet(KEY_SEEN_IDS, null)?.toSet()
+                ?: _shows.value.mapTo(mutableSetOf()) { it.seriesId.uppercase() }
+        }
+
+        val result = SeedMerge.merge(_shows.value, bundled, everSeeded)
+        prefs.edit()
+            .putBoolean(KEY_SEEDED, true)
+            .putStringSet(KEY_SEEN_IDS, result.seenIds)
+            .apply()
+        if (result.shows != _shows.value) persist(result.shows)
     }
 
     fun add(show: Show): Boolean {
@@ -99,6 +113,7 @@ class WhitelistStore private constructor(context: Context) {
                     put("category", s.category)
                     put("hook", s.hook)
                     put("description", s.description)
+                    put("about", s.about)
                     put("meta", s.meta)
                     put("facts", s.facts)
                     put("rating", s.rating)
@@ -108,6 +123,7 @@ class WhitelistStore private constructor(context: Context) {
                             put(JSONObject().apply {
                                 put("name", c.name)
                                 put("role", c.role)
+                                put("bio", c.bio)
                                 put("image", c.image ?: JSONObject.NULL)
                             })
                         }
@@ -136,6 +152,7 @@ class WhitelistStore private constructor(context: Context) {
                 category = o.optString("category", ""),
                 hook = o.optString("hook", ""),
                 description = o.optString("description", ""),
+                about = o.optString("about", ""),
                 meta = o.optString("meta", ""),
                 facts = o.optString("facts", ""),
                 rating = o.optString("rating", ""),
@@ -147,7 +164,8 @@ class WhitelistStore private constructor(context: Context) {
                         CastMember(
                             name = n,
                             role = c.optString("role", ""),
-                            image = c.optString("image").takeIf { it.isNotBlank() && it != "null" }
+                            image = c.optString("image").takeIf { it.isNotBlank() && it != "null" },
+                            bio = c.optString("bio", "")
                         )
                     }
                 } ?: emptyList()
@@ -158,6 +176,7 @@ class WhitelistStore private constructor(context: Context) {
     companion object {
         private const val KEY = "shows_json"
         private const val KEY_SEEDED = "seeded_from_assets"
+        private const val KEY_SEEN_IDS = "seeded_ids"
         private const val SEED_ASSET = "default_whitelist.json"
 
         @Volatile
