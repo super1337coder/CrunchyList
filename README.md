@@ -31,9 +31,20 @@ It needs no AccessibilityService — it reads foreground activity via `UsageStat
 
 **It fails closed.** Anything not positively recognised as an approved screen is bounced. If Crunchyroll renames its activities, CrunchyList becomes unusable rather than permissive — and a **Re-verify** button re-learns the new names by observation.
 
-### Setup
+### Install
 
-Build and install:
+Grab the APK from [Releases](https://github.com/super1337coder/CrunchyList/releases), enable unknown sources on the Streamer, and sideload it. Then open CrunchyList → **Settings** and use **Grant usage access** and **Grant overlay access** — both open the real Google TV Settings screens, so no computer is needed once the APK is on the device.
+
+**Without those two permissions the app filters nothing.** It says so in red on the home screen rather than pretending otherwise.
+
+Set a parent PIN, and you're done: **the app ships with a curated starter list of 27 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) that seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
+
+#### Why it isn't on the Play Store
+
+`SYSTEM_ALERT_WINDOW` is heavily restricted, and an app whose core behaviour is interrupting another app runs straight into Play's Device and Network Abuse policy. Parental control is a recognised exception — but one you apply for and are reviewed as a commercial product, which is disproportionate for something that goes on one TV. `PACKAGE_USAGE_STATS` and `FOREGROUND_SERVICE_SPECIAL_USE` each need their own declared, reviewed use case on top.
+
+<details>
+<summary>Building it yourself instead</summary>
 
 ```bash
 bash tv-app/build.sh assembleDebug
@@ -43,7 +54,7 @@ bash tv-app/build.sh assembleDebug
 adb install -r tv-app/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Then grant the guard's two permissions. Neither is an install-time permission, so this step is required — without them CrunchyList filters nothing:
+Granting the permissions over adb, if you'd rather not use the on-screen buttons:
 
 ```bash
 adb shell appops set com.lastgenlabs.crunchylist GET_USAGE_STATS allow
@@ -53,7 +64,8 @@ adb shell appops set com.lastgenlabs.crunchylist GET_USAGE_STATS allow
 adb shell appops set com.lastgenlabs.crunchylist SYSTEM_ALERT_WINDOW allow
 ```
 
-Open CrunchyList and set a parent PIN. **The app ships with a curated starter list of 27 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) which seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
+To cut a signed release, put a keystore at `~/.crunchylist/keystore.properties` and run `bash tools/release.sh v0.1.0`.
+</details>
 
 ### Verifying it actually works
 
