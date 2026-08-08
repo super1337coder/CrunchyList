@@ -43,9 +43,23 @@ echo "==> tagging $TAG"
 git -C "$HERE" tag -a "$TAG" -m "CrunchyList TV $VER" 2>/dev/null || echo "    tag exists, reusing"
 git -C "$HERE" push origin "$TAG" 2>&1 | tail -1
 
+# winget puts gh on the *user* PATH, which a shell started before the install
+# never picked up — so a freshly installed gh looks missing. Check where it
+# actually lands before giving up on it.
+GH=""
 if command -v gh >/dev/null 2>&1; then
+    GH="gh"
+else
+    for candidate in "/c/Program Files/GitHub CLI/gh.exe" \
+                     "$LOCALAPPDATA/Programs/GitHub CLI/gh.exe" \
+                     "$LOCALAPPDATA/Microsoft/WinGet/Links/gh.exe"; do
+        [ -f "$candidate" ] && GH="$candidate" && break
+    done
+fi
+
+if [ -n "$GH" ]; then
     echo "==> publishing release via gh"
-    gh release create "$TAG" "$OUT" \
+    "$GH" release create "$TAG" "$OUT" \
         --title "CrunchyList TV $VER" \
         --notes-file "$HERE/docs/RELEASE-NOTES.md"
 else
