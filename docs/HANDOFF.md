@@ -5,7 +5,8 @@ this file is just current state and what's next.
 
 ## State
 
-`tv-app/` is a working Google TV app, verified end to end on the emulator (Google TV, API 36).
+`tv-app/` is a working Google TV app, running on the family room Streamer (Android 14) and
+verified end to end there as well as on the emulator.
 `extension/` is legacy and marked as such — it fails open in five places and shares no code.
 
 | | |
@@ -13,32 +14,37 @@ this file is just current state and what's next.
 | Guard (the thing that makes this a parental control) | ✅ 10 behavioural checks pass |
 | Shelves, Keep watching, Surprise me, detail panel, More Info | ✅ |
 | 29 shows seeded with art, long write-ups, cast, portraits and bios | ✅ |
-| Unit tests | ✅ 68 pass |
-| Signed release APK | ✅ `dist/`, tag `v0.1.2` pushed |
+| Unit tests | ✅ 85 pass |
+| Signed release APK | ✅ `dist/`, tag `v0.1.3` pushed |
 | GitHub release published | ❌ **needs your GitHub login** |
-| Tested on the physical Streamer | ❌ never |
+| Tested on the physical Streamer | ✅ 2026-08-08 — all 10 checks pass on hardware |
 
 Build with `bash tv-app/build.sh` — **not** `gradlew` directly. It redirects `TEMP` before the
 JVM starts, working around AF_UNIX being blocked under `AppData\Local\Temp` on this machine.
 
 ```bash
 bash tv-app/build.sh assembleDebug     # build
-bash tv-app/build.sh testDebugUnitTest # 68 unit tests
+bash tv-app/build.sh testDebugUnitTest # 85 unit tests
 bash tools/verify-guard.sh             # 10 behavioural checks, needs a device
-bash tools/release.sh v0.1.2           # signed APK + tag + publish
+bash tools/release.sh v0.1.3           # signed APK + tag + publish
 ```
 
 ## Next, roughly in order
 
-1. **Publish the v0.1.2 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
-   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.2` — notes
-   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.2.apk`. Or
-   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.2`.
+1. **Publish the v0.1.3 release.** Blocked on GitHub auth. Tag is pushed, APK is built.
+   Browser: `https://github.com/super1337coder/CrunchyList/releases/new?tag=v0.1.3` — notes
+   from [RELEASE-NOTES.md](RELEASE-NOTES.md), attach `dist/crunchylist-tv-0.1.3.apk`. Or
+   `winget install GitHub.cli && gh auth login && bash tools/release.sh v0.1.3`.
    **Rebuild the APK first if commits have landed since.**
-   (`v0.1.1` is an earlier tag that was never published. Ignore it, or delete it.)
+   (`v0.1.0`–`v0.1.2` are earlier tags that were never published and now point at code
+   with the first-play bounce in it. `git push origin :refs/tags/v0.1.0 :refs/tags/v0.1.1
+   :refs/tags/v0.1.2` clears them.)
 
-2. **Test on the Streamer.** The specific unknown is whether the guard survives a real boot.
-   Everything to date is emulator-only.
+2. **The reboot test.** The one thing hardware has still not answered: does the guard come
+   back after the Streamer is power-cycled? On the emulator it does — `GuardService` was alive
+   before the app was opened. Check with the TV connected:
+   `adb -s <ip> shell dumpsys activity services com.lastgenlabs.crunchylist | grep -c ServiceRecord`
+   *before* opening CrunchyList.
 
 3. **Shows on hold** — see below. Demon Slayer is the nearest.
 
@@ -80,6 +86,22 @@ generated; see the note at the top of that script.
 `about` is blank-line-separated paragraphs. Keep `description` short — the side panel is sized
 to fit rather than scroll, so length there gets cut off. Length belongs in `about`.
 
+## Connecting to the Streamer
+
+Android 14 wants a pairing step before adb will connect. On the TV:
+Settings → System → About → click **Android TV OS build** ×7, then
+Settings → System → Developer options → **Wireless debugging** → **Pair device with pairing
+code**. That screen shows a 6-digit code and an IP:port — note the port is *different* from the
+one on the Wireless debugging screen itself.
+
+```bash
+adb pair 192.168.1.29:<pairing-port> <code>
+adb connect 192.168.1.29:<connect-port>
+```
+
+The connect port changes on reboot; the pairing is one-time. Everything after that takes
+`-s <ip>:<port>`, because the emulator is usually attached too.
+
 ## Traps that will bite again
 
 Each of these cost real time. They are all in the audit too, repeated here because they are
@@ -89,6 +111,17 @@ the things most likely to waste an hour.
   the More Info dialog. A `LazyColumn` with no focusable content simply will not move, and the
   content below the fold is unreachable. Panel content is sized to fit; the dialog takes focus
   itself and turns up/down into a scroll.
+- **`UsageStatsManager` reports where the TV *was*.** The foreground reading lags, so a tick
+  right after a deep link can still see CrunchyList. Acting on that stale reading threw away the
+  approval just granted and bounced the kid out of a show they were allowed to watch — on the
+  first play only, which made it look random. All of the timing rules now live in
+  `GuardDecision`, pure and tested; do not put conditions back inline in `GuardService.tick`.
+- **`FLAG_ACTIVITY_NEW_TASK` alone reuses the target's task.** Whatever Crunchyroll had on its
+  stack came back with it, and a restored show page classifies as an approved screen inside an
+  approved session. Deep links carry `CLEAR_TASK` for that reason, not for tidiness.
+- **The guard blocks Crunchyroll's own sign-in screen.** It is not a show page and not the
+  player, so it fails closed — which means a fresh device cannot be set up. `GuardPause` is the
+  way through; there is no other one.
 - **Coming back from Crunchyroll recreates MainActivity.** The task ID changes, Compose state
   is gone, and focus resets to the very first tile. Verified, not assumed. Keep watching is
   what makes that survivable — the show you were just watching is the first tile.

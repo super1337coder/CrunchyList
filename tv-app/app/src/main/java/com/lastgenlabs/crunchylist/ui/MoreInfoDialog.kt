@@ -60,8 +60,7 @@ private val Dim = Color(0xFF8E8E9C)
  *
  * Built for a kid who likes knowing who everyone is first: a proper write-up of
  * the show, then a portrait and a paragraph on each main character — who they
- * are, what they can do, what they are like — plus the factual bits and
- * Crunchyroll's content labels.
+ * are, what they can do, what they are like.
  *
  * This is the one screen with room to be long. The side panel has to fit on
  * screen, so it stays short; everything that wants space lands here.
@@ -147,9 +146,12 @@ fun MoreInfoDialog(show: Show, onDismiss: () -> Unit) {
                         items(show.cast, key = { it.name }) { member -> CastRow(member) }
                     }
 
-                    if (show.advisories.isNotBlank()) {
-                        item { Advisories(show) }
-                    }
+                    // Crunchyroll's content labels used to sit here. They are
+                    // still carried in the data, because they are how a parent
+                    // decides whether to put a show on the list at all — but by
+                    // the time a show is on the list that decision is made, and
+                    // showing a kid "Violence, Suicide" under something you have
+                    // already vetted is noise at best.
                 }
 
                 // Pinned rather than the last item in the list. These write-ups
@@ -307,33 +309,5 @@ private fun CastRow(member: CastMember) {
                 Text(member.bio, color = Body, fontSize = 16.sp, lineHeight = 24.sp)
             }
         }
-    }
-}
-
-@Composable
-private fun Advisories(show: Show) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFF241F1A))
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Text(
-            "THINGS TO KNOW",
-            color = Orange,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.5.sp
-        )
-        Text(show.advisories, color = Body, fontSize = 16.sp, lineHeight = 22.sp)
-        // Stated because these labels are a presence flag, not a severity scale —
-        // "Violence" covers both a slapstick bonk and a decapitation.
-        Text(
-            "Crunchyroll's own labels. They say what appears, not how much.",
-            color = Dim,
-            fontSize = 13.sp
-        )
     }
 }

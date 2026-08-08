@@ -47,6 +47,8 @@ Grab the APK from [Releases](https://github.com/super1337coder/CrunchyList/relea
 
 **Without those two permissions the app filters nothing.** It says so in red on the home screen rather than pretending otherwise.
 
+Signing in to Crunchyroll happens on a screen the guard bounces, so there is a way through: **Settings → Let a parent use Crunchyroll** opens a 15-minute window and closes it again on its own. The home screen shows a countdown the whole time it is open.
+
 Set a parent PIN, and you're done: **the app ships with a curated starter list of 29 shows** ([docs/WATCHLIST.md](docs/WATCHLIST.md)) that seeds on first run, so there's nothing to type on a remote. Add or remove shows from Settings; adding takes a Crunchyroll series URL and fetches the title and poster art automatically.
 
 Which shows are on the list is yours — remove one and it stays gone through every update. The write-ups attached to them come from the app, so improving that copy reaches an installed TV.

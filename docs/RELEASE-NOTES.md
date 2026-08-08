@@ -17,6 +17,27 @@ dial with an explicit list.
   "Continue watching" row resumes anything. All three are bounced back.
 - **Ships with 29 shows** already loaded, so there is nothing to type on a remote.
 
+### Changes in 0.1.3
+
+First version tested on real hardware — a Google TV Streamer, Android 14. All ten guard checks
+pass there, not just on the emulator.
+
+- **A parent can now use Crunchyroll.** Found on the first real TV: with the guard running there
+  was no way to reach Crunchyroll's sign-in screen, so a fresh device could not be set up at all.
+  Settings → **Let a parent use Crunchyroll** opens a 15-minute window and closes it again on
+  its own. Time-boxed rather than a switch, and the home screen shows a loud countdown while it
+  is open — a guard that is off must never be quiet about it.
+- **Fixed: the first play of a session sometimes bounced straight back out.** `UsageStatsManager`
+  reports where the TV *was*, not where it is, so a tick immediately after a launch could still
+  see CrunchyList in front and throw away the approval it had just granted. The timing rules are
+  now a separate, tested unit rather than inline conditions.
+- **Content labels removed from the kids' screen.** They are how a parent decides whether a show
+  goes on the list; once it is on the list that decision is made. Still carried in the data and
+  still printed by `tools/fetch-show.ps1`.
+- **New icon and banner** — the family dog, in Crunchyroll orange.
+- Deep links now clear Crunchyroll's task rather than reusing it, so nothing left on that stack
+  can be restored into an approved session.
+
 ### Changes in 0.1.2
 
 - **Keep watching.** A shelf of what has actually been played, newest first, and focus starts

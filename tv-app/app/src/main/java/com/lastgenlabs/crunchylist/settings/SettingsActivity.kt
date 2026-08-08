@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,9 +48,11 @@ import com.lastgenlabs.crunchylist.crunchyroll.TokenDiagnostics
 import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.data.WhitelistStore
 import com.lastgenlabs.crunchylist.guard.GuardCalibrator
+import com.lastgenlabs.crunchylist.guard.GuardPause
 import com.lastgenlabs.crunchylist.guard.GuardPermissions
 import com.lastgenlabs.crunchylist.guard.ScreenPolicy
 import com.lastgenlabs.crunchylist.guard.GuardService
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -167,6 +170,52 @@ private fun SettingsScreen(
     ) {
         item {
             Text("Settings", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        }
+
+        // --- Parent access to Crunchyroll ---------------------------------
+        item {
+            var pausedFor by remember { mutableStateOf(GuardPause.remainingMs(context)) }
+            // Recomputed on a tick so the countdown is live and so the section
+            // flips back to its normal state the moment the pause expires.
+            LaunchedEffect(Unit) {
+                while (true) {
+                    pausedFor = GuardPause.remainingMs(context)
+                    delay(1_000)
+                }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "Parent access to Crunchyroll",
+                    color = Orange,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                if (pausedFor > 0L) {
+                    Text(
+                        "Guard paused — ${GuardPause.format(pausedFor)} left. " +
+                            "Nothing is being filtered.",
+                        color = Color(0xFFE06C6C)
+                    )
+                    TvButton("Resume the guard now") {
+                        GuardPause.cancel(context)
+                        pausedFor = 0L
+                        GuardService.start(context)
+                    }
+                } else {
+                    Text(
+                        "Signing in to Crunchyroll, changing the account or picking a " +
+                            "profile all happen on screens the guard bounces. This opens a " +
+                            "${GuardPause.DEFAULT_MINUTES}-minute window and closes it again on its own.",
+                        color = Dim
+                    )
+                    TvButton("Let a parent use Crunchyroll") {
+                        GuardPause.begin(context)
+                        pausedFor = GuardPause.remainingMs(context)
+                        Crunchyroll.launchIntent(context)?.let { context.startActivity(it) }
+                    }
+                }
+            }
         }
 
         // --- Guard health -------------------------------------------------

@@ -38,10 +38,26 @@ object Crunchyroll {
 
     fun episodeIntent(episodeId: String): Intent = viewIntent(episodeUri(episodeId))
 
+    /**
+     * CLEAR_TASK is not tidiness — it is part of the filter.
+     *
+     * `FLAG_ACTIVITY_NEW_TASK` alone *reuses* Crunchyroll's existing task and
+     * brings it to the front, so whatever was left on that stack comes back with
+     * it. Seen on the real TV: opening Mob Psycho landed correctly and then
+     * flashed over to a show details page left behind by an earlier launch.
+     *
+     * Cosmetically that is a flicker. Behaviourally it is a hole: the restored
+     * screen is a `ShowDetails`, the classifier only sees the class name, and the
+     * session is approved because CrunchyList did start it — so an unapproved show
+     * sitting on Crunchyroll's stack would be shown *and permitted*.
+     *
+     * Clearing costs nothing worth keeping. Resume position lives on the account,
+     * not the activity stack, so "Continue: E7" still works.
+     */
     private fun viewIntent(uri: String): Intent =
         Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
             setPackage(PACKAGE)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
 
     fun isInstalled(context: Context): Boolean = try {

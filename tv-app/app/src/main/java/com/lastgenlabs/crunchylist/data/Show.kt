@@ -70,8 +70,12 @@ data class Show(
 
     /**
      * Crunchyroll's own content labels, e.g. "Violence, Profanity, Smoking".
-     * These flag presence, not severity — useful, not a substitute for a parent
-     * having watched it.
+     *
+     * Kept in the data but no longer shown to the kids. These flag presence, not
+     * severity, and they are how a parent decides whether a show goes on the list
+     * at all — which means by the time a show is on the list the decision has been
+     * made, and putting "Violence, Suicide" under something already vetted only
+     * makes it look unvetted. `tools/fetch-show.ps1` prints them for that decision.
      */
     val advisories: String = "",
 
@@ -90,8 +94,7 @@ data class Show(
      * have no More info button and a trimmed blurb would be genuinely unreadable.
      */
     val hasMoreInfo: Boolean
-        get() = longRead.isNotBlank() || cast.isNotEmpty() || facts.isNotBlank() ||
-            advisories.isNotBlank()
+        get() = longRead.isNotBlank() || cast.isNotEmpty() || facts.isNotBlank()
 
     /** [about] if there is one, falling back to the panel's shorter text. */
     val longRead: String

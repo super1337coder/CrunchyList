@@ -34,11 +34,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lastgenlabs.crunchylist.data.Shelves
 import com.lastgenlabs.crunchylist.data.Show
+import com.lastgenlabs.crunchylist.guard.GuardPause
 import kotlinx.coroutines.delay
 
 private val Bg = Color(0xFF101014)
@@ -91,6 +93,7 @@ fun HomeScreen(
             // closer to the edge than this can simply not exist on the wall.
             .padding(horizontal = OVERSCAN_H, vertical = OVERSCAN_V)
     ) {
+        val context = LocalContext.current
         val playFocus = remember { FocusRequester() }
         val shelves = remember(shows, recentIds) { Shelves.build(shows, recentIds) }
         val anyBlurbs = remember(shows) { shows.any { it.hasBlurb } }
@@ -111,8 +114,19 @@ fun HomeScreen(
             }
         }
 
+        // Ticks while a pause is running so the countdown is live and the banner
+        // disappears the moment enforcement comes back.
+        var pausedFor by remember { mutableStateOf(GuardPause.remainingMs(context)) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                pausedFor = GuardPause.remainingMs(context)
+                delay(1_000)
+            }
+        }
+
         Header(
             guardActive = guardActive,
+            pausedFor = pausedFor,
             canSurprise = shows.size > 1,
             onSurprise = {
                 // Pick something other than what is already showing, so pressing
@@ -253,6 +267,7 @@ private fun BounceNotice(onDismissed: () -> Unit) {
 @Composable
 private fun Header(
     guardActive: Boolean,
+    pausedFor: Long,
     canSurprise: Boolean,
     onSurprise: () -> Unit,
     onSettings: () -> Unit
@@ -275,9 +290,19 @@ private fun Header(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            if (!guardActive) {
-                // Loud on purpose. A silently disabled guard is the failure mode
-                // that matters — the shelves would otherwise look entirely normal.
+            // Loud on purpose, both of them. A silently disabled guard is the
+            // failure mode that matters — the shelves look entirely normal either
+            // way, so the only thing standing between "paused for a minute" and
+            // "off since March" is this being impossible to miss.
+            if (pausedFor > 0L) {
+                Text(
+                    text = "⏸  Guard paused — ${GuardPause.format(pausedFor)}",
+                    color = Color(0xFFE06C6C),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 10.dp)
+                )
+            } else if (!guardActive) {
                 Text(
                     text = "⚠  Guard off",
                     color = Color(0xFFE06C6C),

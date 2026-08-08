@@ -72,47 +72,24 @@ class GuardService : Service() {
     }
 
     private fun tick() {
+        // A parent is doing something in Crunchyroll that the guard would
+        // otherwise make impossible — signing in, most obviously. Expires by
+        // itself; see GuardPause for why it is not a switch.
+        if (GuardPause.isActive(this)) return
+
         val fg = watcher.current() ?: return
 
         val verdict = policy.classify(fg.packageName, fg.className)
+        val action = GuardDecision.decide(
+            verdict = verdict,
+            sessionApproved = SessionOrigin.isApproved(),
+            graceActive = LaunchGrace.isActive()
+        )
 
-        if (verdict == ScreenClassifier.Verdict.IGNORE) {
-            // Something other than Crunchyroll is in front, so any Crunchyroll
-            // session is over. Coming back in must be justified again.
-            SessionOrigin.leftCrunchyroll()
-            return
-        }
-
-        // Crunchyroll reached without CrunchyList launching it — the Google TV home
-        // screen's "Continue watching" row does exactly this, straight into content
-        // nobody approved. The screen type is irrelevant here: an approved *kind* of
-        // screen showing an unapproved *show* is precisely the case the class-name
-        // check cannot see.
-        if (!SessionOrigin.isApproved() && !LaunchGrace.isActive()) {
-            bounce("${fg.className} (session not started by CrunchyList)")
-            return
-        }
-
-        when (verdict) {
-            ScreenClassifier.Verdict.ALLOW -> {
-                // Reaching an approved screen ends any pending grace early: the
-                // launch we were waiting on has landed.
-                LaunchGrace.clear()
-            }
-
-            ScreenClassifier.Verdict.BOUNCE -> {
-                if (LaunchGrace.isActive()) {
-                    // One of our own deep links is still in flight. A legitimate
-                    // launch transits Startup/Main on its way to the show page, and
-                    // bouncing here would make the guard fight itself.
-                    Log.d(TAG, "in grace, not bouncing ${fg.className}")
-                    return
-                }
-                bounce(fg.className)
-            }
-
-            ScreenClassifier.Verdict.IGNORE -> Unit // handled above
-        }
+        if (action.clearSession) SessionOrigin.leftCrunchyroll()
+        if (action.affirmSession) SessionOrigin.beginApprovedSession()
+        if (action.clearGrace) LaunchGrace.clear()
+        if (action.bounce) bounce(fg.className)
     }
 
     private fun bounce(fromClass: String?) {
