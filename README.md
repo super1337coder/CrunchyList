@@ -1,14 +1,65 @@
 # CrunchyList
 
-A Chrome extension that creates a parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch. Everything else is hidden.
+A parent-curated, kid-safe front end for [Crunchyroll](https://www.crunchyroll.com). Parents pick exactly which anime series their kids can watch. Everything else is out of reach.
 
 A [Last Gen Labs](https://lastgenlabs.com) project.
 
-![CrunchyList landing page](screenshots/MainMenu.png)
+## Two front ends
+
+| | |
+|---|---|
+| **`tv-app/`** | **Google TV / Android TV app.** The active project. Runs on the TV itself — no computer involved. |
+| `extension/` | Chrome extension. Works, but only on the laptop it runs on. See [Chrome extension](#chrome-extension) below. |
+
+The extension came first and was abandoned when casting to the TV turned out to be impossible — Crunchyroll removed Chromecast from its web player, and its Widevine DRM blocks the Remote Playback API. The TV app takes a different route: it deep-links into Crunchyroll's own Android app, and enforces the whitelist with a background guard.
+
+See [docs/AUDIT-2026-08.md](docs/AUDIT-2026-08.md) for the full design, every mechanism verified by test, and the traps found along the way.
 
 ## The Problem
 
-Crunchyroll's built-in parental controls are too blunt. Either too much fan service gets through, or the filters are so tight that age-appropriate shows get blocked. CrunchyList solves this by letting a parent hand-pick exactly which series are allowed.
+Crunchyroll's built-in parental controls are one blunt axis — "restrict mature content". That lets through plenty of fan service while blocking things that are perfectly fine. The objection is orthogonal to the dial they give you, so no setting of it works. CrunchyList replaces the dial with an explicit list.
+
+## The Google TV app
+
+**What the kids see:** a grid of approved shows with real poster art. Pick one, and Crunchyroll opens straight to that series — with its own resume state intact, so "Continue: E7" still works.
+
+**What stops them wandering:** a background guard. Crunchyroll's app can otherwise be opened straight from the TV's app menu, and one Back press from a show lands in the full catalogue. The guard watches which activity is foreground and bounces back to CrunchyList whenever Crunchyroll shows anything that isn't an approved screen.
+
+It needs no AccessibilityService — it reads foreground activity via `UsageStatsManager` and returns to the front using a `SYSTEM_ALERT_WINDOW` background-launch exemption.
+
+**It fails closed.** Anything not positively recognised as an approved screen is bounced. If Crunchyroll renames its activities, CrunchyList becomes unusable rather than permissive — and a **Re-verify** button re-learns the new names by observation.
+
+### Setup
+
+Build and install:
+
+```bash
+bash tv-app/build.sh assembleDebug
+```
+
+```bash
+adb install -r tv-app/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Then grant the guard's two permissions. Neither is an install-time permission, so this step is required — without them CrunchyList filters nothing:
+
+```bash
+adb shell appops set com.lastgenlabs.crunchylist GET_USAGE_STATS allow
+```
+
+```bash
+adb shell appops set com.lastgenlabs.crunchylist SYSTEM_ALERT_WINDOW allow
+```
+
+Open CrunchyList, set a parent PIN, and add shows by pasting a Crunchyroll series URL. Titles and poster art are fetched automatically.
+
+> **Note:** `tv-app/build.sh` is a wrapper, not decoration — it redirects `TEMP` before starting the JVM. See the Gradle gotcha in the audit if you're curious why.
+
+---
+
+## Chrome extension
+
+The original laptop-only version. Still functional, but it cannot get video to a TV.
 
 ## How It Works
 
