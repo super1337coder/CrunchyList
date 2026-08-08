@@ -58,7 +58,37 @@ public class ProbeActivity extends Activity {
             return;
         }
         Log.i(TAG, "probe started");
+        inspectCrunchyroll();
         poll();
+    }
+
+    /**
+     * Can we self-heal against Crunchyroll renaming its activities?
+     *
+     * Tests whether an ordinary app can (a) read CR's versionCode — so it can tell
+     * when CR updated and re-calibrate — and (b) enumerate CR's activity classes,
+     * so approved screens can be discovered rather than hardcoded.
+     */
+    private void inspectCrunchyroll() {
+        try {
+            android.content.pm.PackageManager pm = getPackageManager();
+            android.content.pm.PackageInfo pi =
+                pm.getPackageInfo(CR, android.content.pm.PackageManager.GET_ACTIVITIES);
+
+            Log.i(TAG, "CRPKG versionCode=" + pi.getLongVersionCode()
+                     + " versionName=" + pi.versionName);
+
+            if (pi.activities == null) {
+                Log.w(TAG, "CRPKG activities list is NULL");
+                return;
+            }
+            Log.i(TAG, "CRPKG activity count=" + pi.activities.length);
+            for (android.content.pm.ActivityInfo ai : pi.activities) {
+                Log.i(TAG, "CRACT " + ai.name);
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, "CRPKG inspect failed: " + ex);
+        }
     }
 
     private void poll() {
