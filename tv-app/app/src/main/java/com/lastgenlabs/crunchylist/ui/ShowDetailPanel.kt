@@ -99,26 +99,23 @@ fun ShowDetailPanel(
                     modifier = Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    if (s.category.isNotBlank()) {
-                        Text(
-                            s.category.uppercase(),
-                            color = Orange,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.5.sp
-                        )
-                    }
-
+                    // No category line, and no episode counts. Both used to sit
+                    // here and both are now redundant: the shelf heading directly
+                    // to the left already names the category, and the facts are in
+                    // More info. Between them they cost about four lines, which is
+                    // the difference between the write-up below fitting and
+                    // trailing off into an ellipsis that led nowhere.
                     Text(
                         s.title,
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         lineHeight = 29.sp,
-                        // Capped because one title in this list ("BOFURI: I Don't
-                        // Want to Get Hurt, so I'll Max Out My Defense.") ran to
-                        // three lines and pushed the description off the panel.
-                        maxLines = 2,
+                        // Three, because of "BOFURI: I Don't Want to Get Hurt, so
+                        // I'll Max Out My Defense." Cutting a title is worse than
+                        // spending a line on it — you cannot look up what you were
+                        // not shown.
+                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
 
@@ -135,10 +132,11 @@ fun ShowDetailPanel(
                     }
 
                     if (s.description.isNotBlank()) {
-                        // The one flexible element: it gets whatever is left after
-                        // the title, hook and meta have taken theirs, and trails
-                        // off rather than being cut through a line. fill = false
-                        // so a short blurb does not push meta to the floor.
+                        // Every bundled write-up is sized to fit here in full —
+                        // the ellipsis is a backstop for a description a parent
+                        // pasted in, not a normal state. When it does fire, More
+                        // info shows the same text complete, which is why
+                        // hasMoreInfo is true for anything with words in it.
                         Text(
                             s.description,
                             color = Body,
@@ -146,16 +144,6 @@ fun ShowDetailPanel(
                             lineHeight = 23.sp,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
-                        )
-                    }
-
-                    if (s.meta.isNotBlank()) {
-                        Text(
-                            s.meta,
-                            color = Dim,
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp,
-                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

@@ -99,6 +99,12 @@ the things most likely to waste an hour.
   to stop responding. The content is weighted now, and the description ellipsizes.
 - **Clipping is not truncation.** A `Text` that overflows its parent gets cut through a line of
   type. Give it `weight(1f, fill = false)` and `TextOverflow.Ellipsis` so it trails off instead.
+- **An ellipsis has to lead somewhere.** Ellipsizing the panel blurb looked tidy and was worse
+  than clipping: the panel shows `description` and More info shows `about`, so the trimmed
+  words existed nowhere. Every bundled blurb is now sized to fit the panel whole. If you edit
+  one, the budget is roughly 250–300 characters depending on how many lines the title and hook
+  take, and the way to check is `tools/`-free: screenshot each panel and look. Anything that
+  does still ellipsize is reachable, because `hasMoreInfo` is true for any show with text.
 - **`GridCells.Adaptive` sits on a boundary.** `TILE_MIN_WIDTH` and `PANEL_WIDTH` in
   `HomeScreen.kt` are a pair — changing either silently changes the column count.
 - **`getLaunchIntentForPackage()` returns null for TV apps.** They declare

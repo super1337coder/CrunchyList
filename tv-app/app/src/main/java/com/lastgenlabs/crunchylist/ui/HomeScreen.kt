@@ -65,7 +65,7 @@ private val TILE_WIDTH = 104.dp
  * prose across a room. Narrower and the text starts to feel like a column of
  * confetti; wider and the shelves lose a tile.
  */
-private val PANEL_WIDTH = 360.dp
+private val PANEL_WIDTH = 400.dp
 
 /**
  * The kid-facing screen: nothing but parent-approved shows.

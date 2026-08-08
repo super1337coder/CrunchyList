@@ -27,6 +27,9 @@ dial with an explicit list.
 - **Surprise me.** Picks a show at random and hands focus to Play.
 - Fixed: a long write-up pushed **Play** and **More info** off the bottom of the panel while
   leaving them focusable, so selecting one of those shows appeared to freeze the remote.
+- The panel no longer repeats the category or the episode counts — the shelf heading beside it
+  already says the first, and More info has the second. That bought enough room for every
+  write-up and every title to appear in full, verified show by show.
 
 ### Changes in 0.1.1
 

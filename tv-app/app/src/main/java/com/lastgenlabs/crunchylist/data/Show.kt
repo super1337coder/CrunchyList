@@ -81,9 +81,17 @@ data class Show(
     val hasBlurb: Boolean
         get() = hook.isNotBlank() || description.isNotBlank()
 
-    /** True when the More Info screen would have anything beyond the panel. */
+    /**
+     * True when the More Info screen has anything to show.
+     *
+     * Includes the plain [description], because the panel can ellipsize it and
+     * More info is then the only place the rest of it exists. A show added by
+     * pasting a URL has no [about], no cast and no labels — without this it would
+     * have no More info button and a trimmed blurb would be genuinely unreadable.
+     */
     val hasMoreInfo: Boolean
-        get() = about.isNotBlank() || cast.isNotEmpty() || facts.isNotBlank() || advisories.isNotBlank()
+        get() = longRead.isNotBlank() || cast.isNotEmpty() || facts.isNotBlank() ||
+            advisories.isNotBlank()
 
     /** [about] if there is one, falling back to the panel's shorter text. */
     val longRead: String
