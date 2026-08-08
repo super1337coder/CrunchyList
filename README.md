@@ -34,7 +34,7 @@ CrunchyList isn't on the Chrome Web Store yet. Install it manually in developer 
 
 1. Open the CrunchyList options page: right-click the extension icon and select **Options**, or go to `chrome://extensions`, click the three-dot menu (⋮) on CrunchyList, and select **Options**
 2. Enter your 4-digit PIN
-3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family`)
+3. Paste a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family`)
 4. The title and poster image are fetched automatically
 5. Click **Add Show**
 

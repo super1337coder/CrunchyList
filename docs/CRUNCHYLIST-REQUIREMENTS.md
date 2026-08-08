@@ -37,7 +37,7 @@ Crunchyroll's built-in parental controls are too blunt — either too much fan s
 ### 2. Whitelist Management (Options Page)
 
 - Parent-only interface accessed via the extension's options page
-- Add a show by pasting a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family`)
+- Add a show by pasting a Crunchyroll series URL (e.g., `https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family`)
 - Extension extracts the series ID and title automatically (fetch from CR page or let parent type the display name)
 - Optional: paste or upload a thumbnail image URL for the tile
 - Remove shows from the whitelist
@@ -74,8 +74,8 @@ Series page:  https://www.crunchyroll.com/[{locale}/]series/{SERIES_ID}/{slug}
 Watch page:   https://www.crunchyroll.com/[{locale}/]watch/{EPISODE_ID}/{slug}
 
 Examples:
-  https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family
-  https://www.crunchyroll.com/en-us/series/GEXH3WKP7/spy-x-family
+  https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family
+  https://www.crunchyroll.com/en-us/series/G4PH0WXVJ/spy-x-family
 ```
 
 ### Locale Handling
@@ -86,7 +86,7 @@ CR URLs sometimes include locale prefixes (e.g., `/en-us/`, `/fr/`, `/pt-br/`). 
 This applies to both the `background.js` navigation interception and the `content.js` page detection logic.
 
 ### Series-Level Whitelisting
-- The whitelist stores **series IDs** (e.g., `GEXH3WKP7`)
+- The whitelist stores **series IDs** (e.g., `G4PH0WXVJ`)
 - Series pages are easy to match: check if the URL contains a whitelisted series ID
 - Watch pages are harder: the URL contains an episode ID, not a series ID. Strategies:
   1. **Page content inspection:** After the page loads, check for the series ID in the page source / meta tags / structured data
@@ -132,9 +132,9 @@ Whitelist metadata stored in `chrome.storage.sync` (lightweight, stays under quo
 {
   "whitelist": [
     {
-      "seriesId": "GEXH3WKP7",
+      "seriesId": "G4PH0WXVJ",
       "title": "SPY x FAMILY",
-      "url": "https://www.crunchyroll.com/series/GEXH3WKP7/spy-x-family",
+      "url": "https://www.crunchyroll.com/series/G4PH0WXVJ/spy-x-family",
       "dateAdded": "2026-02-27"
     }
   ]
@@ -145,7 +145,7 @@ Image URLs stored separately in `chrome.storage.local` (no quota pressure):
 ```json
 {
   "images": {
-    "GEXH3WKP7": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/..."
+    "G4PH0WXVJ": "https://www.crunchyroll.com/imgsrv/display/thumbnail/480x720/catalog/crunchyroll/..."
   }
 }
 ```

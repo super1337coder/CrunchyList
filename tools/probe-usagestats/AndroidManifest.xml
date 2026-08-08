@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    CrunchyList — UsageStats guard feasibility probe.
+    Answers: can an ordinary app read Crunchyroll's foreground ACTIVITY class names
+    via UsageStatsManager, well enough to tell "approved show page" from "browsing"?
+    See docs/AUDIT-2026-08.md §4.2.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lastgenlabs.clprobe">
+
+    <!-- Special permission: not grantable by the install; must be allowed via
+         Settings > Apps > Special access > Usage access, or:
+           adb shell appops set com.lastgenlabs.clprobe GET_USAGE_STATS allow -->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+
+    <!-- Background Activity Launch (BAL) exemption. Without this, startActivity()
+         from the background is silently blocked:
+           "Background activity launch blocked! goo.gle/android-bal"
+         Grant with:
+           adb shell appops set com.lastgenlabs.clprobe SYSTEM_ALERT_WINDOW allow -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+
+    <application android:label="CL UsageStats Probe">
+        <activity
+            android:name="com.lastgenlabs.clprobe.ProbeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
