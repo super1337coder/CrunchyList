@@ -61,12 +61,17 @@ Which shows are on the list is yours — remove one and it stays gone through ev
 <summary>Building it yourself instead</summary>
 
 ```bash
-bash tv-app/build.sh assembleDebug
+bash tv-app/build.sh assembleCrunchylistDebug
 ```
 
 ```bash
-adb install -r tv-app/app/build/outputs/apk/debug/app-debug.apk
+adb install -r tv-app/app/build/outputs/apk/crunchylist/debug/app-crunchylist-debug.apk
 ```
+
+A second flavour, `local`, exists so you can run your own copy under your own name — households
+tend to call a thing whatever they call it. Put a `strings.xml` with an `app_name` in
+`tv-app/app/src/local/res/values/`, run `python tools/make-icon.py` to generate a matching
+banner, and build `assembleLocalDebug`. That directory is gitignored, so your name stays yours.
 
 Granting the permissions over adb, if you'd rather not use the on-screen buttons:
 
@@ -245,6 +250,17 @@ CrunchyList/
     └── CRUNCHYLIST-REQUIREMENTS.md   # original spec (casting workflow now dead)
 ```
 
+## Credits
+
+App icon: **“Labrador head”** by [Delapouite](https://delapouite.com/), from
+[game-icons.net](https://game-icons.net/1x1/delapouite/labrador-head.html), used under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Recoloured; the shape is unchanged.
+The credit also appears on the app's own Settings screen, because the APK is distributed
+separately from this repository.
+
+Source art and the script that builds the icon and banner from it are in `art/` and
+[`tools/make-icon.py`](tools/make-icon.py).
+
 ## License
 
-MIT
+MIT — except the app icon, which is CC BY 3.0 as above.

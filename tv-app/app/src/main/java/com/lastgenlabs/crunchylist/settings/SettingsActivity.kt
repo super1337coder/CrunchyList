@@ -383,6 +383,19 @@ private fun SettingsScreen(
                 TvButton("Restart guard") { GuardService.start(context) }
             }
         }
+
+        // --- credits ------------------------------------------------------
+        // CC BY 3.0 requires attribution wherever the work travels, and the APK
+        // is distributed on its own from the Releases page — a line in the
+        // README would not follow it onto the device.
+        item {
+            Text(
+                "App icon: “Labrador head” by Delapouite, game-icons.net, CC BY 3.0",
+                color = Dim,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 24.dp)
+            )
+        }
     }
 }
 

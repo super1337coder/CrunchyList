@@ -15,12 +15,15 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TAG="${1:-}"
-APK="$HERE/tv-app/app/build/outputs/apk/release/app-release.apk"
+# The public flavour, explicitly. `assembleRelease` would build the `local` one
+# too, and publishing a privately-named build to a public Releases page would be
+# an easy mistake to make silently.
+APK="$HERE/tv-app/app/build/outputs/apk/crunchylist/release/app-crunchylist-release.apk"
 BT="$LOCALAPPDATA/Android/Sdk/build-tools/36.1.0"
 DIST="$HERE/dist"
 
 echo "==> building release"
-bash "$HERE/tv-app/build.sh" assembleRelease >/dev/null
+bash "$HERE/tv-app/build.sh" assembleCrunchylistRelease >/dev/null
 [ -f "$APK" ] || { echo "no APK produced"; exit 1; }
 
 echo "==> verifying signature"

@@ -35,9 +35,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lastgenlabs.crunchylist.R
 import com.lastgenlabs.crunchylist.data.Shelves
 import com.lastgenlabs.crunchylist.data.Show
 import com.lastgenlabs.crunchylist.guard.GuardPause
@@ -280,7 +282,9 @@ private fun Header(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "CrunchyList",
+            // From resources, not a literal: the `local` flavour renames the app
+            // and this is the one place a kid actually reads the name.
+            text = stringResource(R.string.app_name),
             color = Color.White,
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold

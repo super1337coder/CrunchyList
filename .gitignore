@@ -41,4 +41,13 @@ keystore.properties
 
 # Built release artifacts
 dist/
-crunchy_icon.jpg
+
+# Stray images dropped in the repo root. Deliberate art lives in art/ and is
+# tracked; anything else here is someone's photo and commits are made with
+# `git add -A`.
+/*.jpg
+/*.jpeg
+/*.png
+
+# Overrides for the `local` build flavour -- a private name for a private copy.
+tv-app/app/src/local/

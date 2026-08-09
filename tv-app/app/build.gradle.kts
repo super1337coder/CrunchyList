@@ -32,8 +32,33 @@ android {
         // was added in Q. The Google TV Streamer runs Android 14 (API 34).
         minSdk = 29
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.1.3"
+        versionCode = 5
+        versionName = "0.1.4"
+    }
+
+    // Two flavours over identical code. `crunchylist` is what gets published;
+    // `local` is an escape hatch for anyone who wants their own copy under their
+    // own name — households tend to call a thing whatever they call it.
+    //
+    // Everything `local` overrides lives in `src/local/`, which is gitignored, so
+    // a private name never reaches this repository. With that directory empty the
+    // flavour simply builds an identical app, which is the default here.
+    //
+    // Deliberately NOT a different applicationId. The guard, `tools/verify-guard.sh`
+    // and every adb command in the docs address the app by package — forking that
+    // would mean two of everything, and a verification script that silently checks
+    // the wrong install is exactly the failure this project keeps guarding against.
+    // The trade is that only one of the two can be installed at a time, which is
+    // what you want anyway.
+    flavorDimensions += "audience"
+    productFlavors {
+        create("crunchylist") {
+            dimension = "audience"
+            isDefault = true
+        }
+        create("local") {
+            dimension = "audience"
+        }
     }
 
     signingConfigs {

@@ -17,6 +17,13 @@ dial with an explicit list.
   "Continue watching" row resumes anything. All three are bounced back.
 - **Ships with 29 shows** already loaded, so there is nothing to type on a remote.
 
+### Changes in 0.1.4
+
+- **New icon and banner.** A flat labrador in Crunchyroll orange on charcoal, replacing the
+  photographic one from 0.1.3 — that looked fine at 256px and was a dark blob at 48px, which is
+  the size that decides whether a kid can find the app.
+  Icon: “Labrador head” by Delapouite, game-icons.net, CC BY 3.0.
+
 ### Changes in 0.1.3
 
 First version tested on real hardware — a Google TV Streamer, Android 14. All ten guard checks
@@ -34,7 +41,7 @@ pass there, not just on the emulator.
 - **Content labels removed from the kids' screen.** They are how a parent decides whether a show
   goes on the list; once it is on the list that decision is made. Still carried in the data and
   still printed by `tools/fetch-show.ps1`.
-- **New icon and banner** — the family dog, in Crunchyroll orange.
+- **New icon and banner** — replaced again in 0.1.4, see above.
 - Deep links now clear Crunchyroll's task rather than reusing it, so nothing left on that stack
   can be restored into an approved session.
 

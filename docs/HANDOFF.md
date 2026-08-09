@@ -23,11 +23,41 @@ Build with `bash tv-app/build.sh` — **not** `gradlew` directly. It redirects `
 JVM starts, working around AF_UNIX being blocked under `AppData\Local\Temp` on this machine.
 
 ```bash
-bash tv-app/build.sh assembleDebug     # build
-bash tv-app/build.sh testDebugUnitTest # 85 unit tests
-bash tools/verify-guard.sh             # 10 behavioural checks, needs a device
-bash tools/release.sh v0.1.3           # signed APK + tag + publish
+bash tv-app/build.sh assembleCrunchylistDebug   # the public build
+bash tv-app/build.sh assembleLocalDebug         # your own, privately named
+bash tv-app/build.sh testDebugUnitTest          # 85 unit tests
+bash tools/verify-guard.sh                      # 10 behavioural checks, needs a device
+bash tools/release.sh v0.1.4                    # signed APK + tag + publish
 ```
+
+## Two flavours, one app
+
+`crunchylist` is what gets published. `local` is the same code under a name of your choosing,
+for your own copy. They differ only in `app_name` and the banner — the name is drawn into that
+artwork, so it needs its own file, which `tools/make-icon.py` generates from whatever name
+`src/local/res/values/strings.xml` declares.
+
+**`tv-app/app/src/local/` is gitignored on purpose.** A private name should not end up in a
+public repository, and commits here are made with `git add -A`.
+
+**They share an applicationId on purpose.** The guard, `tools/verify-guard.sh` and every adb
+command in these docs address the app by package; forking that would mean two of everything and
+a verification script that could silently be checking the wrong install. The cost is that only
+one can be installed at a time, which is what you want anyway.
+
+`tools/release.sh` builds `assembleCrunchylistRelease` explicitly rather than `assembleRelease`
+— the latter builds both, and publishing a privately-named APK to a public Releases page is an
+easy mistake to make quietly.
+
+To put your own build on the TV:
+
+```bash
+bash tv-app/build.sh assembleLocalRelease
+adb -s <ip>:<port> install -r tv-app/app/build/outputs/apk/local/release/app-local-release.apk
+```
+
+Same signing key and same package as the published one, so it installs as an update: the
+whitelist, the PIN and Keep watching all survive.
 
 ## Next, roughly in order
 
